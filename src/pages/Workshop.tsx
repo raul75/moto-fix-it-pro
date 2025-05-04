@@ -163,7 +163,7 @@ const Workshop = () => {
             <Button size="lg" variant="secondary" onClick={() => navigate('/contact')} className="text-blue-900">
               {t('workshop.contactUs')}
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10" onClick={() => navigate('/register')}>
+            <Button size="lg" variant="outline" onClick={() => navigate('/register')} className="border-white hover:bg-white/10 text-blue-900">
               {t('workshop.register')}
             </Button>
           </div>
