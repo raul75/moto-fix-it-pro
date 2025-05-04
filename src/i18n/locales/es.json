@@ -1,96 +1,119 @@
 
 {
   "app": {
-    "title": "Gestión de Taller de Motos",
+    "title": "MotoFix",
+    "description": "Sistema de gestión para talleres de motocicletas",
     "nav": {
       "dashboard": "Dashboard",
-      "repairs": "Reparaciones",
       "customers": "Clientes",
       "inventory": "Inventario",
       "invoices": "Facturas",
       "photos": "Fotos",
-      "settings": "Ajustes"
+      "settings": "Configuración",
+      "home": "Inicio"
     }
   },
-  "dashboard": {
-    "title": "Dashboard",
-    "newRepair": "Nueva Reparación",
-    "stats": {
-      "activeRepairs": "Reparaciones Activas",
-      "activeRepairsDesc": "Reparaciones en espera o en curso",
-      "customers": "Clientes",
-      "parts": "Piezas en Inventario",
-      "partsDesc": "{{count}} piezas bajo stock mínimo",
-      "invoices": "Facturas Pendientes"
-    },
-    "activeRepairs": "Reparaciones Activas",
-    "statusRepairs": "Estado de Reparaciones",
-    "pending": "En Espera",
-    "inProgress": "En Proceso",
-    "completed": "Completadas",
-    "lowStock": "Piezas bajo stock mínimo",
-    "available": "disponibles",
-    "min": "Min",
-    "recentInvoices": "Facturas Recientes",
-    "paid": "Pagada",
-    "sent": "Enviada",
-    "overdue": "Vencida",
-    "draft": "Borrador"
-  },
   "settings": {
-    "title": "Ajustes",
+    "title": "Configuración",
     "tabs": {
       "general": "General",
-      "business": "Datos de Empresa",
-      "invoices": "Facturación",
+      "business": "Negocio",
+      "invoices": "Facturas",
       "users": "Usuarios"
     },
     "general": {
-      "title": "Ajustes Generales",
-      "description": "Configura los ajustes generales de la aplicación",
-      "darkMode": "Tema Oscuro",
-      "darkModeDesc": "Activa el tema oscuro para la aplicación",
+      "title": "Configuración General",
+      "description": "Administra la configuración general del sistema",
+      "darkMode": "Modo Oscuro",
+      "darkModeDesc": "Cambia entre modo claro y oscuro",
       "notifications": "Notificaciones",
-      "notificationsDesc": "Recibe notificaciones para nuevas reparaciones y actualizaciones",
-      "lowStockAlerts": "Alertas de Stock Bajo",
-      "lowStockAlertsDesc": "Recibe alertas cuando las piezas bajan del umbral mínimo"
+      "notificationsDesc": "Recibe notificaciones del sistema",
+      "lowStockAlerts": "Alertas de stock bajo",
+      "lowStockAlertsDesc": "Recibe alertas cuando el stock esté bajo"
     },
     "backup": {
       "title": "Copia de Seguridad",
-      "description": "Gestiona las copias de seguridad de tus datos",
-      "autoBackup": "Copia de seguridad automática",
-      "autoBackupDesc": "Crea automáticamente una copia de seguridad diaria de los datos",
-      "manualBackup": "Crear copia de seguridad manual"
+      "description": "Administra las copias de seguridad de tus datos",
+      "autoBackup": "Copia de Seguridad Automática",
+      "autoBackupDesc": "Realiza copias de seguridad automáticamente",
+      "manualBackup": "Hacer Copia de Seguridad"
     },
     "business": {
-      "title": "Datos de Empresa",
-      "description": "Información sobre tu taller",
-      "companyName": "Nombre de Empresa",
+      "title": "Información del Negocio",
+      "description": "Administra la información de tu taller",
+      "companyName": "Nombre de la Empresa",
       "vat": "NIF/CIF",
       "address": "Dirección",
       "city": "Ciudad",
       "zip": "Código Postal",
       "province": "Provincia",
       "phone": "Teléfono",
-      "email": "Correo Electrónico",
-      "save": "Guardar datos de empresa"
+      "email": "Email",
+      "save": "Guardar"
     },
     "invoices": {
-      "title": "Ajustes de Facturación",
-      "description": "Configura los ajustes para las facturas",
+      "title": "Configuración de Facturas",
+      "description": "Personaliza tus facturas",
       "invoicePrefix": "Prefijo de Factura",
       "nextNumber": "Próximo Número",
       "paymentTerms": "Términos de Pago (días)",
       "taxRate": "Tipo de IVA (%)",
-      "invoiceNotes": "Notas Estándar de Factura",
-      "save": "Guardar ajustes"
+      "invoiceNotes": "Notas de Factura",
+      "save": "Guardar"
     },
     "users": {
       "title": "Gestión de Usuarios",
-      "description": "Gestiona los usuarios que pueden acceder al sistema",
-      "addUser": "Añadir Usuario",
+      "description": "Administra los usuarios del sistema",
       "admin": "Administrador",
-      "technician": "Técnico"
+      "technician": "Técnico",
+      "customer": "Cliente",
+      "addUser": "Añadir Usuario"
     }
+  },
+  "auth": {
+    "login": "Iniciar Sesión",
+    "loginDesc": "Inicia sesión para acceder al sistema",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "loginButton": "Iniciar Sesión",
+    "logoutSuccess": "Has cerrado sesión correctamente",
+    "noAccount": "¿No tienes una cuenta?",
+    "registerHere": "Regístrate aquí",
+    "loginSuccess": "Inicio de sesión exitoso",
+    "loginError": "Error al iniciar sesión. Verifica tus credenciales.",
+    "register": "Registrarse",
+    "registerDesc": "Crea una nueva cuenta",
+    "name": "Nombre",
+    "namePlaceholder": "Nombre completo",
+    "confirmPassword": "Confirmar Contraseña",
+    "registerButton": "Registrarse",
+    "haveAccount": "¿Ya tienes una cuenta?",
+    "loginHere": "Inicia sesión aquí",
+    "registerSuccess": "Registro exitoso. Ahora puedes iniciar sesión.",
+    "registerError": "Error al registrar la cuenta. Inténtalo de nuevo.",
+    "emailInUse": "Este correo electrónico ya está en uso.",
+    "logout": "Cerrar Sesión"
+  },
+  "validation": {
+    "emailInvalid": "Email no válido",
+    "passwordMin": "La contraseña debe tener al menos {count} caracteres",
+    "passwordsMatch": "Las contraseñas no coinciden",
+    "nameMin": "El nombre debe tener al menos {count} caracteres",
+    "required": "Este campo es obligatorio"
+  },
+  "roles": {
+    "admin": "Administrador",
+    "technician": "Técnico",
+    "customer": "Cliente"
+  },
+  "nav": {
+    "home": "Inicio",
+    "back": "Volver"
+  },
+  "error": {
+    "accessDenied": "Acceso Denegado",
+    "noPermission": "No tienes permisos para acceder a esta página",
+    "pageNotFound": "Página no encontrada",
+    "pageNotFoundDesc": "La página que estás buscando no existe."
   }
 }

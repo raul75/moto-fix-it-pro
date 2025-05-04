@@ -78,3 +78,16 @@ export type Invoice = {
   notes?: string;
   status: 'draft' | 'sent' | 'paid' | 'overdue';
 };
+
+export type UserRole = 'admin' | 'tecnico' | 'cliente';
+
+export type User = {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  customerId?: string; // Per utenti di tipo cliente collegati a un cliente esistente
+  createdAt: string;
+  lastLogin?: string;
+};
+

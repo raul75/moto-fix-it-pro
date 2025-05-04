@@ -13,6 +13,12 @@ import SettingsPage from "./pages/Settings";
 import RepairDetailsPage from "./pages/RepairDetails";
 import CustomerDetailsPage from "./pages/CustomerDetails";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import AccessDenied from "./pages/AccessDenied";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Index from "./pages/Index";
 
 const queryClient = new QueryClient();
 
@@ -22,20 +28,68 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/customers" element={<CustomersPage />} />
-          <Route path="/customers/:id" element={<CustomerDetailsPage />} />
-          <Route path="/inventory" element={<InventoryPage />} />
-          <Route path="/invoices" element={<InvoicesPage />} />
-          <Route path="/photos" element={<PhotosPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/repairs/:id" element={<RepairDetailsPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            {/* Pagine pubbliche */}
+            <Route path="/" element={<Index />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/accesso-negato" element={<AccessDenied />} />
+            
+            {/* Pagine protette che richiedono l'autenticazione */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            
+            {/* Pagine per admin e tecnici */}
+            <Route path="/customers" element={
+              <ProtectedRoute roles={['admin', 'tecnico']}>
+                <CustomersPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/customers/:id" element={
+              <ProtectedRoute roles={['admin', 'tecnico']}>
+                <CustomerDetailsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/inventory" element={
+              <ProtectedRoute roles={['admin', 'tecnico']}>
+                <InventoryPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/invoices" element={
+              <ProtectedRoute roles={['admin', 'tecnico']}>
+                <InvoicesPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/photos" element={
+              <ProtectedRoute roles={['admin', 'tecnico']}>
+                <PhotosPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/repairs/:id" element={
+              <ProtectedRoute roles={['admin', 'tecnico']}>
+                <RepairDetailsPage />
+              </ProtectedRoute>
+            } />
+            
+            {/* Pagine solo per admin */}
+            <Route path="/settings" element={
+              <ProtectedRoute roles="admin">
+                <SettingsPage />
+              </ProtectedRoute>
+            } />
+            
+            {/* Pagina non trovata */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
 
 export default App;
+

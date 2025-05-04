@@ -1,96 +1,119 @@
 
 {
   "app": {
-    "title": "Gestione Officina Moto",
+    "title": "MotoFix",
+    "description": "Sistema di gestione per officine di motociclette",
     "nav": {
       "dashboard": "Dashboard",
-      "repairs": "Riparazioni",
       "customers": "Clienti",
-      "inventory": "Magazzino",
+      "inventory": "Inventario",
       "invoices": "Fatture",
       "photos": "Foto",
-      "settings": "Impostazioni"
+      "settings": "Impostazioni",
+      "home": "Home"
     }
-  },
-  "dashboard": {
-    "title": "Dashboard",
-    "newRepair": "Nuova Riparazione",
-    "stats": {
-      "activeRepairs": "Riparazioni Attive",
-      "activeRepairsDesc": "Riparazioni in attesa o in corso",
-      "customers": "Clienti",
-      "parts": "Ricambi in Magazzino",
-      "partsDesc": "{{count}} ricambi sotto scorta minima",
-      "invoices": "Fatture da Incassare"
-    },
-    "activeRepairs": "Riparazioni Attive",
-    "statusRepairs": "Stato Riparazioni",
-    "pending": "In Attesa",
-    "inProgress": "In Lavorazione",
-    "completed": "Completate",
-    "lowStock": "Parti sotto scorta minima",
-    "available": "disponibili",
-    "min": "Min",
-    "recentInvoices": "Fatture recenti",
-    "paid": "Pagata",
-    "sent": "Inviata",
-    "overdue": "Scaduta",
-    "draft": "Bozza"
   },
   "settings": {
     "title": "Impostazioni",
     "tabs": {
-      "general": "Generali",
-      "business": "Dati Aziendali",
-      "invoices": "Fatturazione",
+      "general": "Generale",
+      "business": "Azienda",
+      "invoices": "Fatture",
       "users": "Utenti"
     },
     "general": {
       "title": "Impostazioni Generali",
-      "description": "Configura le impostazioni generali dell'applicazione",
-      "darkMode": "Tema scuro",
-      "darkModeDesc": "Attiva il tema scuro per l'applicazione",
+      "description": "Gestisci le impostazioni generali del sistema",
+      "darkMode": "Modalità Scura",
+      "darkModeDesc": "Passa dalla modalità chiara a quella scura",
       "notifications": "Notifiche",
-      "notificationsDesc": "Ricevi notifiche per nuove riparazioni e aggiornamenti",
-      "lowStockAlerts": "Avvisi scorte basse",
-      "lowStockAlertsDesc": "Ricevi avvisi quando le parti scendono sotto la soglia minima"
+      "notificationsDesc": "Ricevi notifiche dal sistema",
+      "lowStockAlerts": "Avvisi di Scorte Basse",
+      "lowStockAlertsDesc": "Ricevi avvisi quando le scorte sono basse"
     },
     "backup": {
-      "title": "Backup Dati",
+      "title": "Backup",
       "description": "Gestisci i backup dei tuoi dati",
-      "autoBackup": "Backup automatico",
-      "autoBackupDesc": "Crea automaticamente un backup giornaliero dei dati",
-      "manualBackup": "Crea backup manuale"
+      "autoBackup": "Backup Automatico",
+      "autoBackupDesc": "Crea backup automaticamente",
+      "manualBackup": "Crea Backup"
     },
     "business": {
-      "title": "Dati Aziendali",
-      "description": "Informazioni sulla tua officina",
+      "title": "Informazioni Aziendali",
+      "description": "Gestisci le informazioni della tua officina",
       "companyName": "Nome Azienda",
-      "vat": "Partita IVA",
+      "vat": "P.IVA/Codice Fiscale",
       "address": "Indirizzo",
       "city": "Città",
       "zip": "CAP",
       "province": "Provincia",
       "phone": "Telefono",
       "email": "Email",
-      "save": "Salva dati aziendali"
+      "save": "Salva"
     },
     "invoices": {
-      "title": "Impostazioni Fatturazione",
-      "description": "Configura le impostazioni per le fatture",
+      "title": "Impostazioni Fatture",
+      "description": "Personalizza le tue fatture",
       "invoicePrefix": "Prefisso Fattura",
       "nextNumber": "Prossimo Numero",
       "paymentTerms": "Termini di Pagamento (giorni)",
       "taxRate": "Aliquota IVA (%)",
-      "invoiceNotes": "Note Standard Fattura",
-      "save": "Salva impostazioni"
+      "invoiceNotes": "Note Fattura",
+      "save": "Salva"
     },
     "users": {
       "title": "Gestione Utenti",
-      "description": "Gestisci gli utenti che possono accedere al sistema",
-      "addUser": "Aggiungi Utente",
+      "description": "Gestisci gli utenti del sistema",
       "admin": "Amministratore",
-      "technician": "Tecnico"
+      "technician": "Tecnico",
+      "customer": "Cliente",
+      "addUser": "Aggiungi Utente"
     }
+  },
+  "auth": {
+    "login": "Accedi",
+    "loginDesc": "Accedi per utilizzare il sistema",
+    "email": "Email",
+    "password": "Password",
+    "loginButton": "Accedi",
+    "logoutSuccess": "Hai effettuato il logout con successo",
+    "noAccount": "Non hai un account?",
+    "registerHere": "Registrati qui",
+    "loginSuccess": "Accesso effettuato con successo",
+    "loginError": "Errore di accesso. Verifica le tue credenziali.",
+    "register": "Registrati",
+    "registerDesc": "Crea un nuovo account",
+    "name": "Nome",
+    "namePlaceholder": "Nome completo",
+    "confirmPassword": "Conferma Password",
+    "registerButton": "Registrati",
+    "haveAccount": "Hai già un account?",
+    "loginHere": "Accedi qui",
+    "registerSuccess": "Registrazione completata. Ora puoi accedere.",
+    "registerError": "Errore durante la registrazione. Riprova.",
+    "emailInUse": "Questa email è già in uso.",
+    "logout": "Logout"
+  },
+  "validation": {
+    "emailInvalid": "Email non valida",
+    "passwordMin": "La password deve essere di almeno {count} caratteri",
+    "passwordsMatch": "Le password non corrispondono",
+    "nameMin": "Il nome deve essere di almeno {count} caratteri",
+    "required": "Questo campo è obbligatorio"
+  },
+  "roles": {
+    "admin": "Amministratore",
+    "technician": "Tecnico",
+    "customer": "Cliente"
+  },
+  "nav": {
+    "home": "Home",
+    "back": "Indietro"
+  },
+  "error": {
+    "accessDenied": "Accesso Negato",
+    "noPermission": "Non hai il permesso di accedere a questa pagina",
+    "pageNotFound": "Pagina Non Trovata",
+    "pageNotFoundDesc": "La pagina che stai cercando non esiste."
   }
 }

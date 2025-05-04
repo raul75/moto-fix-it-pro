@@ -1,96 +1,119 @@
 
 {
   "app": {
-    "title": "Motorcycle Workshop Management",
+    "title": "MotoFix",
+    "description": "Management system for motorcycle workshops",
     "nav": {
       "dashboard": "Dashboard",
-      "repairs": "Repairs",
       "customers": "Customers",
       "inventory": "Inventory",
       "invoices": "Invoices",
       "photos": "Photos",
-      "settings": "Settings"
+      "settings": "Settings",
+      "home": "Home"
     }
-  },
-  "dashboard": {
-    "title": "Dashboard",
-    "newRepair": "New Repair",
-    "stats": {
-      "activeRepairs": "Active Repairs",
-      "activeRepairsDesc": "Pending or in-progress repairs",
-      "customers": "Customers",
-      "parts": "Parts in Stock",
-      "partsDesc": "{{count}} parts below minimum stock",
-      "invoices": "Pending Invoices"
-    },
-    "activeRepairs": "Active Repairs",
-    "statusRepairs": "Repair Status",
-    "pending": "Pending",
-    "inProgress": "In Progress",
-    "completed": "Completed",
-    "lowStock": "Parts below minimum stock",
-    "available": "available",
-    "min": "Min",
-    "recentInvoices": "Recent Invoices",
-    "paid": "Paid",
-    "sent": "Sent",
-    "overdue": "Overdue",
-    "draft": "Draft"
   },
   "settings": {
     "title": "Settings",
     "tabs": {
       "general": "General",
-      "business": "Business Data",
-      "invoices": "Invoicing",
+      "business": "Business",
+      "invoices": "Invoices",
       "users": "Users"
     },
     "general": {
       "title": "General Settings",
-      "description": "Configure the general application settings",
+      "description": "Manage the general system settings",
       "darkMode": "Dark Mode",
-      "darkModeDesc": "Enable dark mode for the application",
+      "darkModeDesc": "Switch between light and dark modes",
       "notifications": "Notifications",
-      "notificationsDesc": "Receive notifications for new repairs and updates",
+      "notificationsDesc": "Receive system notifications",
       "lowStockAlerts": "Low Stock Alerts",
-      "lowStockAlertsDesc": "Receive alerts when parts fall below minimum threshold"
+      "lowStockAlertsDesc": "Receive alerts when stock is low"
     },
     "backup": {
       "title": "Backup",
       "description": "Manage your data backups",
-      "autoBackup": "Automatic backup",
-      "autoBackupDesc": "Automatically create a daily backup of your data",
-      "manualBackup": "Create manual backup"
+      "autoBackup": "Automatic Backup",
+      "autoBackupDesc": "Automatically create backups",
+      "manualBackup": "Create Backup"
     },
     "business": {
-      "title": "Business Data",
-      "description": "Information about your workshop",
+      "title": "Business Information",
+      "description": "Manage your workshop information",
       "companyName": "Company Name",
-      "vat": "VAT ID",
+      "vat": "VAT/Tax ID",
       "address": "Address",
       "city": "City",
-      "zip": "ZIP Code",
-      "province": "State/Province",
+      "zip": "Zip Code",
+      "province": "Province/State",
       "phone": "Phone",
       "email": "Email",
-      "save": "Save business data"
+      "save": "Save"
     },
     "invoices": {
       "title": "Invoice Settings",
-      "description": "Configure invoice settings",
+      "description": "Customize your invoices",
       "invoicePrefix": "Invoice Prefix",
       "nextNumber": "Next Number",
       "paymentTerms": "Payment Terms (days)",
       "taxRate": "Tax Rate (%)",
-      "invoiceNotes": "Standard Invoice Notes",
-      "save": "Save settings"
+      "invoiceNotes": "Invoice Notes",
+      "save": "Save"
     },
     "users": {
       "title": "User Management",
-      "description": "Manage users who can access the system",
-      "addUser": "Add User",
+      "description": "Manage system users",
       "admin": "Administrator",
-      "technician": "Technician"
+      "technician": "Technician",
+      "customer": "Customer",
+      "addUser": "Add User"
     }
+  },
+  "auth": {
+    "login": "Login",
+    "loginDesc": "Login to access the system",
+    "email": "Email",
+    "password": "Password",
+    "loginButton": "Login",
+    "logoutSuccess": "You have successfully logged out",
+    "noAccount": "Don't have an account?",
+    "registerHere": "Register here",
+    "loginSuccess": "Login successful",
+    "loginError": "Login error. Check your credentials.",
+    "register": "Register",
+    "registerDesc": "Create a new account",
+    "name": "Name",
+    "namePlaceholder": "Full name",
+    "confirmPassword": "Confirm Password",
+    "registerButton": "Register",
+    "haveAccount": "Already have an account?",
+    "loginHere": "Login here",
+    "registerSuccess": "Registration successful. You can now login.",
+    "registerError": "Error registering the account. Please try again.",
+    "emailInUse": "This email is already in use.",
+    "logout": "Logout"
+  },
+  "validation": {
+    "emailInvalid": "Invalid email",
+    "passwordMin": "Password must be at least {count} characters",
+    "passwordsMatch": "Passwords do not match",
+    "nameMin": "Name must be at least {count} characters",
+    "required": "This field is required"
+  },
+  "roles": {
+    "admin": "Administrator",
+    "technician": "Technician",
+    "customer": "Customer"
+  },
+  "nav": {
+    "home": "Home",
+    "back": "Back"
+  },
+  "error": {
+    "accessDenied": "Access Denied",
+    "noPermission": "You don't have permission to access this page",
+    "pageNotFound": "Page Not Found",
+    "pageNotFoundDesc": "The page you are looking for doesn't exist."
   }
 }
