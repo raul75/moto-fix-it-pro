@@ -35,7 +35,10 @@ const RepairDetailsPage = () => {
     );
   }
   
-  const { repair, motorcycle, customer } = repairDetails;
+  // Destructure the repairDetails object
+  const { motorcycle, customer } = repairDetails;
+  // Treat repairDetails as the repair object itself
+  const repair = repairDetails;
   
   // Calculate totals
   const partsCost = repair.parts.reduce((sum, part) => sum + (part.priceEach * part.quantity), 0);

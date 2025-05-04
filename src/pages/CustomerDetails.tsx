@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 import StatusBadge from '@/components/StatusBadge';
 import { ChevronLeft, Edit, Plus, Phone, Mail } from 'lucide-react';
 import { getCustomerWithMotorcycles, repairs, motorcycles, invoices } from '@/data/mockData';
