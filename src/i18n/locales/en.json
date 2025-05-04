@@ -1,0 +1,96 @@
+
+{
+  "app": {
+    "title": "Motorcycle Workshop Management",
+    "nav": {
+      "dashboard": "Dashboard",
+      "repairs": "Repairs",
+      "customers": "Customers",
+      "inventory": "Inventory",
+      "invoices": "Invoices",
+      "photos": "Photos",
+      "settings": "Settings"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "newRepair": "New Repair",
+    "stats": {
+      "activeRepairs": "Active Repairs",
+      "activeRepairsDesc": "Pending or in-progress repairs",
+      "customers": "Customers",
+      "parts": "Parts in Stock",
+      "partsDesc": "{{count}} parts below minimum stock",
+      "invoices": "Pending Invoices"
+    },
+    "activeRepairs": "Active Repairs",
+    "statusRepairs": "Repair Status",
+    "pending": "Pending",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "lowStock": "Parts below minimum stock",
+    "available": "available",
+    "min": "Min",
+    "recentInvoices": "Recent Invoices",
+    "paid": "Paid",
+    "sent": "Sent",
+    "overdue": "Overdue",
+    "draft": "Draft"
+  },
+  "settings": {
+    "title": "Settings",
+    "tabs": {
+      "general": "General",
+      "business": "Business Data",
+      "invoices": "Invoicing",
+      "users": "Users"
+    },
+    "general": {
+      "title": "General Settings",
+      "description": "Configure the general application settings",
+      "darkMode": "Dark Mode",
+      "darkModeDesc": "Enable dark mode for the application",
+      "notifications": "Notifications",
+      "notificationsDesc": "Receive notifications for new repairs and updates",
+      "lowStockAlerts": "Low Stock Alerts",
+      "lowStockAlertsDesc": "Receive alerts when parts fall below minimum threshold"
+    },
+    "backup": {
+      "title": "Backup",
+      "description": "Manage your data backups",
+      "autoBackup": "Automatic backup",
+      "autoBackupDesc": "Automatically create a daily backup of your data",
+      "manualBackup": "Create manual backup"
+    },
+    "business": {
+      "title": "Business Data",
+      "description": "Information about your workshop",
+      "companyName": "Company Name",
+      "vat": "VAT ID",
+      "address": "Address",
+      "city": "City",
+      "zip": "ZIP Code",
+      "province": "State/Province",
+      "phone": "Phone",
+      "email": "Email",
+      "save": "Save business data"
+    },
+    "invoices": {
+      "title": "Invoice Settings",
+      "description": "Configure invoice settings",
+      "invoicePrefix": "Invoice Prefix",
+      "nextNumber": "Next Number",
+      "paymentTerms": "Payment Terms (days)",
+      "taxRate": "Tax Rate (%)",
+      "invoiceNotes": "Standard Invoice Notes",
+      "save": "Save settings"
+    },
+    "users": {
+      "title": "User Management",
+      "description": "Manage users who can access the system",
+      "addUser": "Add User",
+      "admin": "Administrator",
+      "technician": "Technician"
+    }
+  }
+}

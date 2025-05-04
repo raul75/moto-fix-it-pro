@@ -1,4 +1,6 @@
+
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,56 +12,58 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 
 const SettingsPage = () => {
+  const { t } = useTranslation();
+  
   return (
     <Layout>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Impostazioni</h1>
+        <h1 className="text-2xl font-bold">{t('settings.title')}</h1>
       </div>
 
       <Tabs defaultValue="general" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="general">Generali</TabsTrigger>
-          <TabsTrigger value="business">Dati Aziendali</TabsTrigger>
-          <TabsTrigger value="invoices">Fatturazione</TabsTrigger>
-          <TabsTrigger value="users">Utenti</TabsTrigger>
+          <TabsTrigger value="general">{t('settings.tabs.general')}</TabsTrigger>
+          <TabsTrigger value="business">{t('settings.tabs.business')}</TabsTrigger>
+          <TabsTrigger value="invoices">{t('settings.tabs.invoices')}</TabsTrigger>
+          <TabsTrigger value="users">{t('settings.tabs.users')}</TabsTrigger>
         </TabsList>
         
         <TabsContent value="general" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Impostazioni Generali</CardTitle>
+              <CardTitle>{t('settings.general.title')}</CardTitle>
               <CardDescription>
-                Configura le impostazioni generali dell'applicazione
+                {t('settings.general.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="dark-mode">Tema scuro</Label>
+                  <Label htmlFor="dark-mode">{t('settings.general.darkMode')}</Label>
                   <Switch id="dark-mode" />
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Attiva il tema scuro per l'applicazione
+                  {t('settings.general.darkModeDesc')}
                 </p>
               </div>
               
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="notifications">Notifiche</Label>
+                  <Label htmlFor="notifications">{t('settings.general.notifications')}</Label>
                   <Switch id="notifications" defaultChecked />
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Ricevi notifiche per nuove riparazioni e aggiornamenti
+                  {t('settings.general.notificationsDesc')}
                 </p>
               </div>
               
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="low-stock-alerts">Avvisi scorte basse</Label>
+                  <Label htmlFor="low-stock-alerts">{t('settings.general.lowStockAlerts')}</Label>
                   <Switch id="low-stock-alerts" defaultChecked />
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Ricevi avvisi quando le parti scendono sotto la soglia minima
+                  {t('settings.general.lowStockAlertsDesc')}
                 </p>
               </div>
             </CardContent>
@@ -67,23 +71,23 @@ const SettingsPage = () => {
           
           <Card>
             <CardHeader>
-              <CardTitle>Backup Dati</CardTitle>
+              <CardTitle>{t('settings.backup.title')}</CardTitle>
               <CardDescription>
-                Gestisci i backup dei tuoi dati
+                {t('settings.backup.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="auto-backup">Backup automatico</Label>
+                  <Label htmlFor="auto-backup">{t('settings.backup.autoBackup')}</Label>
                   <Switch id="auto-backup" defaultChecked />
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Crea automaticamente un backup giornaliero dei dati
+                  {t('settings.backup.autoBackupDesc')}
                 </p>
               </div>
               
-              <Button variant="outline">Crea backup manuale</Button>
+              <Button variant="outline">{t('settings.backup.manualBackup')}</Button>
             </CardContent>
           </Card>
         </TabsContent>
@@ -91,60 +95,60 @@ const SettingsPage = () => {
         <TabsContent value="business" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Dati Aziendali</CardTitle>
+              <CardTitle>{t('settings.business.title')}</CardTitle>
               <CardDescription>
-                Informazioni sulla tua officina
+                {t('settings.business.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="company-name">Nome Azienda</Label>
+                    <Label htmlFor="company-name">{t('settings.business.companyName')}</Label>
                     <Input id="company-name" placeholder="MotoFix Officina" />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="vat">Partita IVA</Label>
+                    <Label htmlFor="vat">{t('settings.business.vat')}</Label>
                     <Input id="vat" placeholder="IT12345678901" />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="address">Indirizzo</Label>
+                  <Label htmlFor="address">{t('settings.business.address')}</Label>
                   <Input id="address" placeholder="Via dell'Officina 123" />
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="city">Città</Label>
+                    <Label htmlFor="city">{t('settings.business.city')}</Label>
                     <Input id="city" placeholder="Milano" />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="zip">CAP</Label>
+                    <Label htmlFor="zip">{t('settings.business.zip')}</Label>
                     <Input id="zip" placeholder="20100" />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="province">Provincia</Label>
+                    <Label htmlFor="province">{t('settings.business.province')}</Label>
                     <Input id="province" placeholder="MI" />
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Telefono</Label>
+                    <Label htmlFor="phone">{t('settings.business.phone')}</Label>
                     <Input id="phone" placeholder="02 1234567" />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">{t('settings.business.email')}</Label>
                     <Input id="email" placeholder="info@motofix.it" type="email" />
                   </div>
                 </div>
                 
-                <Button type="submit">Salva dati aziendali</Button>
+                <Button type="submit">{t('settings.business.save')}</Button>
               </form>
             </CardContent>
           </Card>
@@ -153,37 +157,37 @@ const SettingsPage = () => {
         <TabsContent value="invoices" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Impostazioni Fatturazione</CardTitle>
+              <CardTitle>{t('settings.invoices.title')}</CardTitle>
               <CardDescription>
-                Configura le impostazioni per le fatture
+                {t('settings.invoices.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="invoice-prefix">Prefisso Fattura</Label>
+                    <Label htmlFor="invoice-prefix">{t('settings.invoices.invoicePrefix')}</Label>
                     <Input id="invoice-prefix" placeholder="INV-" />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="next-number">Prossimo Numero</Label>
+                    <Label htmlFor="next-number">{t('settings.invoices.nextNumber')}</Label>
                     <Input id="next-number" placeholder="2023-003" />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="payment-terms">Termini di Pagamento (giorni)</Label>
+                  <Label htmlFor="payment-terms">{t('settings.invoices.paymentTerms')}</Label>
                   <Input id="payment-terms" placeholder="30" type="number" />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="tax-rate">Aliquota IVA (%)</Label>
+                  <Label htmlFor="tax-rate">{t('settings.invoices.taxRate')}</Label>
                   <Input id="tax-rate" placeholder="22" type="number" />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="invoice-notes">Note Standard Fattura</Label>
+                  <Label htmlFor="invoice-notes">{t('settings.invoices.invoiceNotes')}</Label>
                   <Textarea 
                     id="invoice-notes" 
                     placeholder="Pagamento da effettuare entro 30 giorni dalla data della fattura."
@@ -191,7 +195,7 @@ const SettingsPage = () => {
                   />
                 </div>
                 
-                <Button type="submit">Salva impostazioni</Button>
+                <Button type="submit">{t('settings.invoices.save')}</Button>
               </form>
             </CardContent>
           </Card>
@@ -200,9 +204,9 @@ const SettingsPage = () => {
         <TabsContent value="users" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Gestione Utenti</CardTitle>
+              <CardTitle>{t('settings.users.title')}</CardTitle>
               <CardDescription>
-                Gestisci gli utenti che possono accedere al sistema
+                {t('settings.users.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -212,7 +216,7 @@ const SettingsPage = () => {
                     <p className="font-medium">Admin</p>
                     <p className="text-sm text-muted-foreground">admin@motofix.it</p>
                   </div>
-                  <Badge variant="outline">Amministratore</Badge>
+                  <Badge variant="outline">{t('settings.users.admin')}</Badge>
                 </div>
                 
                 <div className="flex justify-between items-center">
@@ -220,10 +224,10 @@ const SettingsPage = () => {
                     <p className="font-medium">Tecnico</p>
                     <p className="text-sm text-muted-foreground">tecnico@motofix.it</p>
                   </div>
-                  <Badge variant="outline">Tecnico</Badge>
+                  <Badge variant="outline">{t('settings.users.technician')}</Badge>
                 </div>
                 
-                <Button>Aggiungi Utente</Button>
+                <Button>{t('settings.users.addUser')}</Button>
               </div>
             </CardContent>
           </Card>

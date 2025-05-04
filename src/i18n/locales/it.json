@@ -1,0 +1,96 @@
+
+{
+  "app": {
+    "title": "Gestione Officina Moto",
+    "nav": {
+      "dashboard": "Dashboard",
+      "repairs": "Riparazioni",
+      "customers": "Clienti",
+      "inventory": "Magazzino",
+      "invoices": "Fatture",
+      "photos": "Foto",
+      "settings": "Impostazioni"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "newRepair": "Nuova Riparazione",
+    "stats": {
+      "activeRepairs": "Riparazioni Attive",
+      "activeRepairsDesc": "Riparazioni in attesa o in corso",
+      "customers": "Clienti",
+      "parts": "Ricambi in Magazzino",
+      "partsDesc": "{{count}} ricambi sotto scorta minima",
+      "invoices": "Fatture da Incassare"
+    },
+    "activeRepairs": "Riparazioni Attive",
+    "statusRepairs": "Stato Riparazioni",
+    "pending": "In Attesa",
+    "inProgress": "In Lavorazione",
+    "completed": "Completate",
+    "lowStock": "Parti sotto scorta minima",
+    "available": "disponibili",
+    "min": "Min",
+    "recentInvoices": "Fatture recenti",
+    "paid": "Pagata",
+    "sent": "Inviata",
+    "overdue": "Scaduta",
+    "draft": "Bozza"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "tabs": {
+      "general": "Generali",
+      "business": "Dati Aziendali",
+      "invoices": "Fatturazione",
+      "users": "Utenti"
+    },
+    "general": {
+      "title": "Impostazioni Generali",
+      "description": "Configura le impostazioni generali dell'applicazione",
+      "darkMode": "Tema scuro",
+      "darkModeDesc": "Attiva il tema scuro per l'applicazione",
+      "notifications": "Notifiche",
+      "notificationsDesc": "Ricevi notifiche per nuove riparazioni e aggiornamenti",
+      "lowStockAlerts": "Avvisi scorte basse",
+      "lowStockAlertsDesc": "Ricevi avvisi quando le parti scendono sotto la soglia minima"
+    },
+    "backup": {
+      "title": "Backup Dati",
+      "description": "Gestisci i backup dei tuoi dati",
+      "autoBackup": "Backup automatico",
+      "autoBackupDesc": "Crea automaticamente un backup giornaliero dei dati",
+      "manualBackup": "Crea backup manuale"
+    },
+    "business": {
+      "title": "Dati Aziendali",
+      "description": "Informazioni sulla tua officina",
+      "companyName": "Nome Azienda",
+      "vat": "Partita IVA",
+      "address": "Indirizzo",
+      "city": "Città",
+      "zip": "CAP",
+      "province": "Provincia",
+      "phone": "Telefono",
+      "email": "Email",
+      "save": "Salva dati aziendali"
+    },
+    "invoices": {
+      "title": "Impostazioni Fatturazione",
+      "description": "Configura le impostazioni per le fatture",
+      "invoicePrefix": "Prefisso Fattura",
+      "nextNumber": "Prossimo Numero",
+      "paymentTerms": "Termini di Pagamento (giorni)",
+      "taxRate": "Aliquota IVA (%)",
+      "invoiceNotes": "Note Standard Fattura",
+      "save": "Salva impostazioni"
+    },
+    "users": {
+      "title": "Gestione Utenti",
+      "description": "Gestisci gli utenti che possono accedere al sistema",
+      "addUser": "Aggiungi Utente",
+      "admin": "Amministratore",
+      "technician": "Tecnico"
+    }
+  }
+}

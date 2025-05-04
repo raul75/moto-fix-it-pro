@@ -1,92 +1,122 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Wrench, Truck, Package, Receipt, Settings, Users, Image } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { NavLink, useLocation } from 'react-router-dom';
+import { Wrench, Users, Package, Receipt, Camera, Settings as SettingsIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import LanguageSelector from './LanguageSelector';
 
-interface SidebarItemProps {
-  icon: React.ReactNode;
-  label: string;
-  to: string;
-  active: boolean;
-}
-
-const SidebarItem: React.FC<SidebarItemProps> = ({ icon, label, to, active }) => {
-  return (
-    <Link
-      to={to}
-      className={cn(
-        "flex items-center gap-3 rounded-lg px-3 py-2 transition-all",
-        active 
-          ? "bg-primary text-primary-foreground" 
-          : "text-muted-foreground hover:bg-muted hover:text-foreground"
-      )}
-    >
-      {icon}
-      <span>{label}</span>
-    </Link>
-  );
-};
-
-const Sidebar: React.FC = () => {
-  const location = useLocation();
-  const pathname = location.pathname;
-  
-  const navItems = [
-    { icon: <Wrench className="h-5 w-5" />, label: "Riparazioni", to: "/" },
-    { icon: <Users className="h-5 w-5" />, label: "Clienti", to: "/customers" },
-    { icon: <Package className="h-5 w-5" />, label: "Magazzino", to: "/inventory" },
-    { icon: <Receipt className="h-5 w-5" />, label: "Fatture", to: "/invoices" },
-    { icon: <Image className="h-5 w-5" />, label: "Documenti", to: "/photos" },
-    { icon: <Settings className="h-5 w-5" />, label: "Impostazioni", to: "/settings" },
-  ];
-
-  return (
-    <aside className="hidden md:flex md:w-64 flex-col border-r bg-sidebar gap-2 p-4">
-      <div className="flex items-center gap-2 px-4 py-2">
-        <Wrench className="h-6 w-6 text-motofix-blue" />
-        <h1 className="text-xl font-bold">MotoFix Pro</h1>
-      </div>
-      <div className="mt-8 flex flex-1 flex-col gap-1">
-        {navItems.map((item) => (
-          <SidebarItem
-            key={item.to}
-            icon={item.icon}
-            label={item.label}
-            to={item.to}
-            active={pathname === item.to}
-          />
-        ))}
-      </div>
-    </aside>
-  );
-};
-
-interface LayoutProps {
+type LayoutProps = {
   children: React.ReactNode;
-}
-
-const MobileHeader: React.FC = () => {
-  return (
-    <header className="md:hidden flex items-center justify-between border-b p-4">
-      <div className="flex items-center gap-2">
-        <Wrench className="h-6 w-6 text-motofix-blue" />
-        <h1 className="text-xl font-bold">MotoFix Pro</h1>
-      </div>
-      <div>
-        {/* Mobile menu button could go here */}
-      </div>
-    </header>
-  );
 };
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout = ({ children }: LayoutProps) => {
+  const location = useLocation();
+  const { t } = useTranslation();
+  
+  const isActive = (path: string) => {
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
+
   return (
-    <div className="flex min-h-screen flex-col md:flex-row">
-      <Sidebar />
-      <div className="flex flex-1 flex-col">
-        <MobileHeader />
-        <main className="flex-1 p-4 md:p-6">
+    <div className="min-h-screen flex">
+      {/* Sidebar */}
+      <div className="w-64 bg-card border-r flex flex-col">
+        <div className="p-4 border-b">
+          <h1 className="text-lg font-bold">{t('app.title')}</h1>
+        </div>
+        <nav className="flex-1 p-4">
+          <ul className="space-y-1">
+            <li>
+              <NavLink
+                to="/"
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
+                  isActive('/') && !isActive('/repairs') && !isActive('/customers') && !isActive('/inventory') && !isActive('/invoices') && !isActive('/photos') && !isActive('/settings')
+                    ? 'bg-accent text-accent-foreground hover:bg-accent/80'
+                    : 'hover:bg-muted'
+                }`}
+              >
+                <Wrench className="h-5 w-5" />
+                <span>{t('app.nav.dashboard')}</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/customers"
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
+                  isActive('/customers')
+                    ? 'bg-accent text-accent-foreground hover:bg-accent/80'
+                    : 'hover:bg-muted'
+                }`}
+              >
+                <Users className="h-5 w-5" />
+                <span>{t('app.nav.customers')}</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/inventory"
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
+                  isActive('/inventory')
+                    ? 'bg-accent text-accent-foreground hover:bg-accent/80'
+                    : 'hover:bg-muted'
+                }`}
+              >
+                <Package className="h-5 w-5" />
+                <span>{t('app.nav.inventory')}</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/invoices"
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
+                  isActive('/invoices')
+                    ? 'bg-accent text-accent-foreground hover:bg-accent/80'
+                    : 'hover:bg-muted'
+                }`}
+              >
+                <Receipt className="h-5 w-5" />
+                <span>{t('app.nav.invoices')}</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/photos"
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
+                  isActive('/photos')
+                    ? 'bg-accent text-accent-foreground hover:bg-accent/80'
+                    : 'hover:bg-muted'
+                }`}
+              >
+                <Camera className="h-5 w-5" />
+                <span>{t('app.nav.photos')}</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/settings"
+                className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
+                  isActive('/settings')
+                    ? 'bg-accent text-accent-foreground hover:bg-accent/80'
+                    : 'hover:bg-muted'
+                }`}
+              >
+                <SettingsIcon className="h-5 w-5" />
+                <span>{t('app.nav.settings')}</span>
+              </NavLink>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+      {/* Main content */}
+      <div className="flex-1 overflow-auto">
+        <header className="border-b bg-card p-4 sticky top-0 z-10 flex justify-between items-center">
+          <div>
+            {/* Header content can go here */}
+          </div>
+          <LanguageSelector />
+        </header>
+        <main className="p-6">
           {children}
         </main>
       </div>

@@ -1,0 +1,96 @@
+
+{
+  "app": {
+    "title": "Gestión de Taller de Motos",
+    "nav": {
+      "dashboard": "Dashboard",
+      "repairs": "Reparaciones",
+      "customers": "Clientes",
+      "inventory": "Inventario",
+      "invoices": "Facturas",
+      "photos": "Fotos",
+      "settings": "Ajustes"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "newRepair": "Nueva Reparación",
+    "stats": {
+      "activeRepairs": "Reparaciones Activas",
+      "activeRepairsDesc": "Reparaciones en espera o en curso",
+      "customers": "Clientes",
+      "parts": "Piezas en Inventario",
+      "partsDesc": "{{count}} piezas bajo stock mínimo",
+      "invoices": "Facturas Pendientes"
+    },
+    "activeRepairs": "Reparaciones Activas",
+    "statusRepairs": "Estado de Reparaciones",
+    "pending": "En Espera",
+    "inProgress": "En Proceso",
+    "completed": "Completadas",
+    "lowStock": "Piezas bajo stock mínimo",
+    "available": "disponibles",
+    "min": "Min",
+    "recentInvoices": "Facturas Recientes",
+    "paid": "Pagada",
+    "sent": "Enviada",
+    "overdue": "Vencida",
+    "draft": "Borrador"
+  },
+  "settings": {
+    "title": "Ajustes",
+    "tabs": {
+      "general": "General",
+      "business": "Datos de Empresa",
+      "invoices": "Facturación",
+      "users": "Usuarios"
+    },
+    "general": {
+      "title": "Ajustes Generales",
+      "description": "Configura los ajustes generales de la aplicación",
+      "darkMode": "Tema Oscuro",
+      "darkModeDesc": "Activa el tema oscuro para la aplicación",
+      "notifications": "Notificaciones",
+      "notificationsDesc": "Recibe notificaciones para nuevas reparaciones y actualizaciones",
+      "lowStockAlerts": "Alertas de Stock Bajo",
+      "lowStockAlertsDesc": "Recibe alertas cuando las piezas bajan del umbral mínimo"
+    },
+    "backup": {
+      "title": "Copia de Seguridad",
+      "description": "Gestiona las copias de seguridad de tus datos",
+      "autoBackup": "Copia de seguridad automática",
+      "autoBackupDesc": "Crea automáticamente una copia de seguridad diaria de los datos",
+      "manualBackup": "Crear copia de seguridad manual"
+    },
+    "business": {
+      "title": "Datos de Empresa",
+      "description": "Información sobre tu taller",
+      "companyName": "Nombre de Empresa",
+      "vat": "NIF/CIF",
+      "address": "Dirección",
+      "city": "Ciudad",
+      "zip": "Código Postal",
+      "province": "Provincia",
+      "phone": "Teléfono",
+      "email": "Correo Electrónico",
+      "save": "Guardar datos de empresa"
+    },
+    "invoices": {
+      "title": "Ajustes de Facturación",
+      "description": "Configura los ajustes para las facturas",
+      "invoicePrefix": "Prefijo de Factura",
+      "nextNumber": "Próximo Número",
+      "paymentTerms": "Términos de Pago (días)",
+      "taxRate": "Tipo de IVA (%)",
+      "invoiceNotes": "Notas Estándar de Factura",
+      "save": "Guardar ajustes"
+    },
+    "users": {
+      "title": "Gestión de Usuarios",
+      "description": "Gestiona los usuarios que pueden acceder al sistema",
+      "addUser": "Añadir Usuario",
+      "admin": "Administrador",
+      "technician": "Técnico"
+    }
+  }
+}
