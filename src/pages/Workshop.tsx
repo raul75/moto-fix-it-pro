@@ -1,24 +1,16 @@
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Wrench, Award, Clock, Check, Phone } from 'lucide-react';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel';
-
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 const Workshop = () => {
-  const { t } = useTranslation();
+  const {
+    t
+  } = useTranslation();
   const navigate = useNavigate();
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-b from-motofix-blue to-blue-900 text-white py-20">
         <div className="container mx-auto px-4 relative z-10">
@@ -34,20 +26,15 @@ const Workshop = () => {
                 <Button size="lg" onClick={() => navigate('/services')} className="bg-white text-blue-900 hover:bg-gray-100">
                   {t('workshop.services')}
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => navigate('/contact')} className="border-white text-white hover:bg-white/10">
+                <Button size="lg" variant="outline" onClick={() => navigate('/contact')} className="border-white hover:bg-white/10 text-blue-900">
                   {t('workshop.contact')}
                 </Button>
               </div>
             </div>
             <div className="md:w-1/2">
-              <img 
-                src="/workshop-hero.jpg" 
-                alt="Workshop" 
-                className="rounded-lg shadow-xl w-full h-auto object-cover"
-                onError={(e) => {
-                  e.currentTarget.src = "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1000";
-                }}
-              />
+              <img src="/workshop-hero.jpg" alt="Workshop" className="rounded-lg shadow-xl w-full h-auto object-cover" onError={e => {
+              e.currentTarget.src = "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1000";
+            }} />
             </div>
           </div>
         </div>
@@ -64,12 +51,19 @@ const Workshop = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              { icon: <Wrench className="h-10 w-10" />, title: t('workshop.serviceRepair'), description: t('workshop.serviceRepairDesc') },
-              { icon: <Wrench className="h-10 w-10" />, title: t('workshop.serviceMaintenance'), description: t('workshop.serviceMaintenanceDesc') },
-              { icon: <Award className="h-10 w-10" />, title: t('workshop.serviceCustomization'), description: t('workshop.serviceCustomizationDesc') },
-            ].map((service, idx) => (
-              <Card key={idx} className="hover:shadow-lg transition-shadow duration-300">
+            {[{
+            icon: <Wrench className="h-10 w-10" />,
+            title: t('workshop.serviceRepair'),
+            description: t('workshop.serviceRepairDesc')
+          }, {
+            icon: <Wrench className="h-10 w-10" />,
+            title: t('workshop.serviceMaintenance'),
+            description: t('workshop.serviceMaintenanceDesc')
+          }, {
+            icon: <Award className="h-10 w-10" />,
+            title: t('workshop.serviceCustomization'),
+            description: t('workshop.serviceCustomizationDesc')
+          }].map((service, idx) => <Card key={idx} className="hover:shadow-lg transition-shadow duration-300">
                 <CardContent className="pt-6 flex flex-col items-center text-center">
                   <div className="bg-primary/10 p-3 rounded-full text-primary mb-4">
                     {service.icon}
@@ -77,8 +71,7 @@ const Workshop = () => {
                   <h3 className="text-xl font-bold mb-2">{service.title}</h3>
                   <p className="text-muted-foreground">{service.description}</p>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -94,15 +87,31 @@ const Workshop = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-10 gap-x-6">
-            {[
-              { icon: <Check className="h-6 w-6" />, title: t('workshop.certified'), description: t('workshop.certifiedDesc') },
-              { icon: <Clock className="h-6 w-6" />, title: t('workshop.quickService'), description: t('workshop.quickServiceDesc') },
-              { icon: <Award className="h-6 w-6" />, title: t('workshop.qualityParts'), description: t('workshop.qualityPartsDesc') },
-              { icon: <Wrench className="h-6 w-6" />, title: t('workshop.modernEquipment'), description: t('workshop.modernEquipmentDesc') },
-              { icon: <Phone className="h-6 w-6" />, title: t('workshop.support'), description: t('workshop.supportDesc') },
-              { icon: <Award className="h-6 w-6" />, title: t('workshop.warranty'), description: t('workshop.warrantyDesc') },
-            ].map((feature, idx) => (
-              <div key={idx} className="flex items-start">
+            {[{
+            icon: <Check className="h-6 w-6" />,
+            title: t('workshop.certified'),
+            description: t('workshop.certifiedDesc')
+          }, {
+            icon: <Clock className="h-6 w-6" />,
+            title: t('workshop.quickService'),
+            description: t('workshop.quickServiceDesc')
+          }, {
+            icon: <Award className="h-6 w-6" />,
+            title: t('workshop.qualityParts'),
+            description: t('workshop.qualityPartsDesc')
+          }, {
+            icon: <Wrench className="h-6 w-6" />,
+            title: t('workshop.modernEquipment'),
+            description: t('workshop.modernEquipmentDesc')
+          }, {
+            icon: <Phone className="h-6 w-6" />,
+            title: t('workshop.support'),
+            description: t('workshop.supportDesc')
+          }, {
+            icon: <Award className="h-6 w-6" />,
+            title: t('workshop.warranty'),
+            description: t('workshop.warrantyDesc')
+          }].map((feature, idx) => <div key={idx} className="flex items-start">
                 <div className="bg-primary/10 p-2 rounded-full text-primary mr-4 mt-1 flex-shrink-0">
                   {feature.icon}
                 </div>
@@ -110,8 +119,7 @@ const Workshop = () => {
                   <h3 className="text-lg font-bold mb-2">{feature.title}</h3>
                   <p className="text-muted-foreground">{feature.description}</p>
                 </div>
-              </div>
-            ))}
+              </div>)}
           </div>
         </div>
       </section>
@@ -129,20 +137,13 @@ const Workshop = () => {
           <div className="px-10">
             <Carousel>
               <CarouselContent>
-                {[1, 2, 3, 4, 5].map((item) => (
-                  <CarouselItem key={item} className="md:basis-1/2 lg:basis-1/3">
+                {[1, 2, 3, 4, 5].map(item => <CarouselItem key={item} className="md:basis-1/2 lg:basis-1/3">
                     <div className="p-1">
-                      <img 
-                        src={`/workshop-${item}.jpg`} 
-                        alt={`Workshop Gallery ${item}`}
-                        className="rounded-md w-full aspect-video object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = `https://images.unsplash.com/photo-152710945255${item}-bcdc7c283ce7?q=80&w=500`;
-                        }}
-                      />
+                      <img src={`/workshop-${item}.jpg`} alt={`Workshop Gallery ${item}`} className="rounded-md w-full aspect-video object-cover" onError={e => {
+                    e.currentTarget.src = `https://images.unsplash.com/photo-152710945255${item}-bcdc7c283ce7?q=80&w=500`;
+                  }} />
                     </div>
-                  </CarouselItem>
-                ))}
+                  </CarouselItem>)}
               </CarouselContent>
               <CarouselPrevious className="-left-2" />
               <CarouselNext className="-right-2" />
@@ -168,8 +169,6 @@ const Workshop = () => {
           </div>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 };
-
 export default Workshop;
