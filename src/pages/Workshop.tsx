@@ -160,7 +160,7 @@ const Workshop = () => {
             {t('workshop.readyToStartDesc')}
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" variant="secondary" onClick={() => navigate('/contact')}>
+            <Button size="lg" variant="secondary" onClick={() => navigate('/contact')} className="text-blue-900">
               {t('workshop.contactUs')}
             </Button>
             <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10" onClick={() => navigate('/register')}>
