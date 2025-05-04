@@ -32,9 +32,9 @@ const Workshop = () => {
               </div>
             </div>
             <div className="md:w-1/2">
-              <img src="/workshop-hero.jpg" alt="Workshop" className="rounded-lg shadow-xl w-full h-auto object-cover" onError={e => {
+              <img alt="Workshop" className="rounded-lg shadow-xl w-full h-auto object-cover" onError={e => {
               e.currentTarget.src = "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1000";
-            }} />
+            }} src="/lovable-uploads/74fcdf73-0df4-42ff-804c-d6b7b368441c.jpg" />
             </div>
           </div>
         </div>
