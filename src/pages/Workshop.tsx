@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
-import { Wrench, Tools, Award, Clock, Check, Phone } from 'lucide-react';
+import { Wrench, Award, Clock, Check, Phone } from 'lucide-react';
 import {
   Carousel,
   CarouselContent,
@@ -66,7 +66,7 @@ const Workshop = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { icon: <Wrench className="h-10 w-10" />, title: t('workshop.serviceRepair'), description: t('workshop.serviceRepairDesc') },
-              { icon: <Tools className="h-10 w-10" />, title: t('workshop.serviceMaintenance'), description: t('workshop.serviceMaintenanceDesc') },
+              { icon: <Wrench className="h-10 w-10" />, title: t('workshop.serviceMaintenance'), description: t('workshop.serviceMaintenanceDesc') },
               { icon: <Award className="h-10 w-10" />, title: t('workshop.serviceCustomization'), description: t('workshop.serviceCustomizationDesc') },
             ].map((service, idx) => (
               <Card key={idx} className="hover:shadow-lg transition-shadow duration-300">
@@ -98,7 +98,7 @@ const Workshop = () => {
               { icon: <Check className="h-6 w-6" />, title: t('workshop.certified'), description: t('workshop.certifiedDesc') },
               { icon: <Clock className="h-6 w-6" />, title: t('workshop.quickService'), description: t('workshop.quickServiceDesc') },
               { icon: <Award className="h-6 w-6" />, title: t('workshop.qualityParts'), description: t('workshop.qualityPartsDesc') },
-              { icon: <Tools className="h-6 w-6" />, title: t('workshop.modernEquipment'), description: t('workshop.modernEquipmentDesc') },
+              { icon: <Wrench className="h-6 w-6" />, title: t('workshop.modernEquipment'), description: t('workshop.modernEquipmentDesc') },
               { icon: <Phone className="h-6 w-6" />, title: t('workshop.support'), description: t('workshop.supportDesc') },
               { icon: <Award className="h-6 w-6" />, title: t('workshop.warranty'), description: t('workshop.warrantyDesc') },
             ].map((feature, idx) => (
