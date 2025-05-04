@@ -1,4 +1,3 @@
-
 {
   "app": {
     "title": "MotoFix",
@@ -10,7 +9,8 @@
       "invoices": "Fatture",
       "photos": "Foto",
       "settings": "Impostazioni",
-      "home": "Home"
+      "home": "Home",
+      "workshop": "La Nostra Officina"
     }
   },
   "settings": {
@@ -115,5 +115,38 @@
     "noPermission": "Non hai il permesso di accedere a questa pagina",
     "pageNotFound": "Pagina Non Trovata",
     "pageNotFoundDesc": "La pagina che stai cercando non esiste."
+  },
+  "workshop": {
+    "title": "Officina Professionale di Riparazione Motociclette",
+    "subtitle": "Servizio esperto e manutenzione per tutte le marche e i modelli di motociclette",
+    "services": "I Nostri Servizi",
+    "servicesDescription": "Offriamo un'ampia gamma di servizi professionali di riparazione e manutenzione per motociclette",
+    "contact": "Contattaci",
+    "serviceRepair": "Riparazioni e Diagnostica",
+    "serviceRepairDesc": "Diagnostica professionale e riparazioni per tutti i problemi meccanici ed elettrici",
+    "serviceMaintenance": "Manutenzione Regolare",
+    "serviceMaintenanceDesc": "Manutenzione programmata e messe a punto per mantenere la tua moto in condizioni ottimali",
+    "serviceCustomization": "Modifiche Personalizzate",
+    "serviceCustomizationDesc": "Modifiche e aggiornamenti personalizzati per migliorare prestazioni e stile",
+    "whyChoose": "Perché Sceglierci",
+    "whyChooseDescription": "Con anni di esperienza e dedizione alla qualità, siamo il partner di fiducia per la cura della tua motocicletta",
+    "certified": "Tecnici Certificati",
+    "certifiedDesc": "Il nostro team è composto da specialisti di motociclette formati e certificati",
+    "quickService": "Tempi Rapidi",
+    "quickServiceDesc": "Valorizziamo il tuo tempo e ci impegniamo a completare le riparazioni rapidamente senza sacrificare la qualità",
+    "qualityParts": "Ricambi di Qualità",
+    "qualityPartsDesc": "Utilizziamo solo ricambi originali o aftermarket di alta qualità per tutte le riparazioni",
+    "modernEquipment": "Attrezzatura Moderna",
+    "modernEquipmentDesc": "La nostra officina è dotata degli strumenti diagnostici e di riparazione più recenti",
+    "support": "Assistenza Clienti",
+    "supportDesc": "Forniamo supporto e consigli continui per la manutenzione della tua motocicletta",
+    "warranty": "Garanzia di Servizio",
+    "warrantyDesc": "Tutto il nostro lavoro di riparazione viene fornito con una garanzia di soddisfazione",
+    "gallery": "Galleria dell'Officina",
+    "galleryDescription": "Fai un tour della nostra struttura e attrezzatura moderna",
+    "readyToStart": "Pronto a Sperimentare un Servizio Professionale?",
+    "readyToStartDesc": "Prenota un appuntamento o registrati per ricevere promemoria di manutenzione regolare",
+    "contactUs": "Contattaci Ora",
+    "register": "Registrati come Cliente"
   }
 }

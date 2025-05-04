@@ -19,6 +19,7 @@ import AccessDenied from "./pages/AccessDenied";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
+import Workshop from "./pages/Workshop";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
           <Routes>
             {/* Pagine pubbliche */}
             <Route path="/" element={<Index />} />
+            <Route path="/workshop" element={<Workshop />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/accesso-negato" element={<AccessDenied />} />
@@ -92,4 +94,3 @@ const App = () => (
 );
 
 export default App;
-

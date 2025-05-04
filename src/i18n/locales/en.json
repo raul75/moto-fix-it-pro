@@ -1,4 +1,3 @@
-
 {
   "app": {
     "title": "MotoFix",
@@ -10,7 +9,8 @@
       "invoices": "Invoices",
       "photos": "Photos",
       "settings": "Settings",
-      "home": "Home"
+      "home": "Home",
+      "workshop": "Our Workshop"
     }
   },
   "settings": {
@@ -115,5 +115,38 @@
     "noPermission": "You don't have permission to access this page",
     "pageNotFound": "Page Not Found",
     "pageNotFoundDesc": "The page you are looking for doesn't exist."
+  },
+  "workshop": {
+    "title": "Professional Motorcycle Repair Workshop",
+    "subtitle": "Expert service and maintenance for all motorcycle brands and models",
+    "services": "Our Services",
+    "servicesDescription": "We offer a wide range of professional motorcycle repair and maintenance services",
+    "contact": "Contact Us",
+    "serviceRepair": "Repairs & Troubleshooting",
+    "serviceRepairDesc": "Professional diagnostics and repairs for all mechanical and electrical issues",
+    "serviceMaintenance": "Regular Maintenance",
+    "serviceMaintenanceDesc": "Scheduled maintenance and tune-ups to keep your motorcycle in top condition",
+    "serviceCustomization": "Custom Modifications",
+    "serviceCustomizationDesc": "Personalized modifications and upgrades to enhance performance and style",
+    "whyChoose": "Why Choose Us",
+    "whyChooseDescription": "With years of experience and dedication to quality, we're your trusted motorcycle care partner",
+    "certified": "Certified Technicians",
+    "certifiedDesc": "Our team consists of factory-trained and certified motorcycle specialists",
+    "quickService": "Quick Turnaround",
+    "quickServiceDesc": "We value your time and strive to complete repairs promptly without sacrificing quality",
+    "qualityParts": "Quality Parts",
+    "qualityPartsDesc": "We use only genuine or high-quality aftermarket parts for all repairs",
+    "modernEquipment": "Modern Equipment",
+    "modernEquipmentDesc": "Our workshop is equipped with the latest diagnostic and repair tools",
+    "support": "Customer Support",
+    "supportDesc": "We provide ongoing support and advice for maintaining your motorcycle",
+    "warranty": "Service Warranty",
+    "warrantyDesc": "All our repair work comes with a satisfaction guarantee",
+    "gallery": "Workshop Gallery",
+    "galleryDescription": "Take a tour of our modern facility and equipment",
+    "readyToStart": "Ready to Experience Professional Service?",
+    "readyToStartDesc": "Book an appointment or register for regular maintenance reminders",
+    "contactUs": "Contact Us Now",
+    "register": "Register as Customer"
   }
 }

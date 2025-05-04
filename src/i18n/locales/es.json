@@ -1,4 +1,3 @@
-
 {
   "app": {
     "title": "MotoFix",
@@ -10,7 +9,8 @@
       "invoices": "Facturas",
       "photos": "Fotos",
       "settings": "Configuración",
-      "home": "Inicio"
+      "home": "Inicio",
+      "workshop": "Nuestro Taller"
     }
   },
   "settings": {
@@ -115,5 +115,38 @@
     "noPermission": "No tienes permisos para acceder a esta página",
     "pageNotFound": "Página no encontrada",
     "pageNotFoundDesc": "La página que estás buscando no existe."
+  },
+  "workshop": {
+    "title": "Taller Profesional de Reparación de Motocicletas",
+    "subtitle": "Servicio experto y mantenimiento para todas las marcas y modelos de motocicletas",
+    "services": "Nuestros Servicios",
+    "servicesDescription": "Ofrecemos una amplia gama de servicios profesionales de reparación y mantenimiento de motocicletas",
+    "contact": "Contáctanos",
+    "serviceRepair": "Reparaciones y Diagnóstico",
+    "serviceRepairDesc": "Diagnóstico profesional y reparaciones para todos los problemas mecánicos y eléctricos",
+    "serviceMaintenance": "Mantenimiento Regular",
+    "serviceMaintenanceDesc": "Mantenimiento programado y puestas a punto para mantener tu motocicleta en óptimas condiciones",
+    "serviceCustomization": "Modificaciones Personalizadas",
+    "serviceCustomizationDesc": "Modificaciones y mejoras personalizadas para aumentar el rendimiento y el estilo",
+    "whyChoose": "Por Qué Elegirnos",
+    "whyChooseDescription": "Con años de experiencia y dedicación a la calidad, somos tu socio de confianza para el cuidado de tu motocicleta",
+    "certified": "Técnicos Certificados",
+    "certifiedDesc": "Nuestro equipo está formado por especialistas en motocicletas capacitados y certificados",
+    "quickService": "Servicio Rápido",
+    "quickServiceDesc": "Valoramos tu tiempo y nos esforzamos por completar las reparaciones rápidamente sin sacrificar la calidad",
+    "qualityParts": "Piezas de Calidad",
+    "qualityPartsDesc": "Utilizamos solo piezas originales o de alta calidad para todas las reparaciones",
+    "modernEquipment": "Equipamiento Moderno",
+    "modernEquipmentDesc": "Nuestro taller está equipado con las últimas herramientas de diagnóstico y reparación",
+    "support": "Atención al Cliente",
+    "supportDesc": "Proporcionamos apoyo y asesoramiento continuos para el mantenimiento de tu motocicleta",
+    "warranty": "Garantía de Servicio",
+    "warrantyDesc": "Todo nuestro trabajo de reparación viene con una garantía de satisfacción",
+    "gallery": "Galería del Taller",
+    "galleryDescription": "Haz un recorrido por nuestras instalaciones y equipamiento moderno",
+    "readyToStart": "¿Listo para Experimentar un Servicio Profesional?",
+    "readyToStartDesc": "Reserva una cita o regístrate para recibir recordatorios de mantenimiento regular",
+    "contactUs": "Contáctanos Ahora",
+    "register": "Registrarse como Cliente"
   }
 }

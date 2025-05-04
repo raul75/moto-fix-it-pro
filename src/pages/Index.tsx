@@ -29,24 +29,34 @@ const Index = () => {
           {t('app.description')}
         </p>
         
-        {isAuthenticated ? (
-          <Button size="lg" onClick={() => navigate('/dashboard')}>
-            {t('app.nav.dashboard')} →
+        <div className="flex flex-col space-y-4">
+          {isAuthenticated ? (
+            <Button size="lg" onClick={() => navigate('/dashboard')}>
+              {t('app.nav.dashboard')} →
+            </Button>
+          ) : (
+            <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 justify-center">
+              <Button size="lg" onClick={() => navigate('/login')}>
+                {t('auth.login')}
+              </Button>
+              <Button size="lg" variant="outline" onClick={() => navigate('/register')}>
+                {t('auth.register')}
+              </Button>
+            </div>
+          )}
+          
+          <Button 
+            variant="secondary" 
+            size="lg" 
+            onClick={() => navigate('/workshop')}
+            className="mt-4"
+          >
+            {t('app.nav.workshop')}
           </Button>
-        ) : (
-          <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 justify-center">
-            <Button size="lg" onClick={() => navigate('/login')}>
-              {t('auth.login')}
-            </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/register')}>
-              {t('auth.register')}
-            </Button>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
 };
 
 export default Index;
-
