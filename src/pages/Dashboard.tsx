@@ -6,8 +6,10 @@ import StatsCard from '@/components/StatsCard';
 import RepairCard from '@/components/RepairCard';
 import { Wrench, Users, Package, Receipt, Plus } from 'lucide-react';
 import { repairs, getActiveRepairs, motorcycles, customers, inventoryParts, invoices, getLowStockParts } from '@/data/mockData';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const activeRepairs = getActiveRepairs();
   const lowStockParts = getLowStockParts();
   
@@ -22,11 +24,41 @@ const Dashboard = () => {
     return { repair, motorcycle, customer };
   });
 
+  // Function to handle card clicks
+  const handleCardClick = (type: string) => {
+    switch(type) {
+      case 'repairs':
+        navigate('/repairs');
+        break;
+      case 'customers':
+        navigate('/customers');
+        break;
+      case 'inventory':
+        navigate('/inventory');
+        break;
+      case 'invoices':
+        navigate('/invoices');
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Function to handle new repair button click
+  const handleNewRepairClick = () => {
+    navigate('/repairs/new');
+  };
+
+  // Function to handle repair card click
+  const handleRepairClick = (repairId: string) => {
+    navigate(`/repairs/${repairId}`);
+  };
+
   return (
     <Layout>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Dashboard</h1>
-        <Button className="flex gap-1">
+        <Button className="flex gap-1" onClick={handleNewRepairClick}>
           <Plus className="h-4 w-4" />
           Nuova Riparazione
         </Button>
@@ -34,41 +66,54 @@ const Dashboard = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatsCard 
-          title="Riparazioni Attive"
-          value={activeRepairs.length}
-          icon={<Wrench className="h-5 w-5" />}
-          description="Riparazioni in attesa o in corso"
-        />
-        <StatsCard 
-          title="Clienti"
-          value={customers.length}
-          icon={<Users className="h-5 w-5" />}
-          trend={{ value: 5, positive: true }}
-        />
-        <StatsCard 
-          title="Ricambi in Magazzino"
-          value={inventoryParts.reduce((sum, part) => sum + part.quantity, 0)}
-          icon={<Package className="h-5 w-5" />}
-          description={`${lowStockParts.length} ricambi sotto scorta minima`}
-        />
-        <StatsCard 
-          title="Fatture da Incassare"
-          value={`€${invoices.filter(i => i.status === 'sent').reduce((sum, inv) => sum + inv.total, 0).toFixed(2)}`}
-          icon={<Receipt className="h-5 w-5" />}
-        />
+        <div onClick={() => handleCardClick('repairs')} className="cursor-pointer">
+          <StatsCard 
+            title="Riparazioni Attive"
+            value={activeRepairs.length}
+            icon={<Wrench className="h-5 w-5" />}
+            description="Riparazioni in attesa o in corso"
+          />
+        </div>
+        <div onClick={() => handleCardClick('customers')} className="cursor-pointer">
+          <StatsCard 
+            title="Clienti"
+            value={customers.length}
+            icon={<Users className="h-5 w-5" />}
+            trend={{ value: 5, positive: true }}
+          />
+        </div>
+        <div onClick={() => handleCardClick('inventory')} className="cursor-pointer">
+          <StatsCard 
+            title="Ricambi in Magazzino"
+            value={inventoryParts.reduce((sum, part) => sum + part.quantity, 0)}
+            icon={<Package className="h-5 w-5" />}
+            description={`${lowStockParts.length} ricambi sotto scorta minima`}
+          />
+        </div>
+        <div onClick={() => handleCardClick('invoices')} className="cursor-pointer">
+          <StatsCard 
+            title="Fatture da Incassare"
+            value={`€${invoices.filter(i => i.status === 'sent').reduce((sum, inv) => sum + inv.total, 0).toFixed(2)}`}
+            icon={<Receipt className="h-5 w-5" />}
+          />
+        </div>
       </div>
 
       {/* Active repairs section */}
       <h2 className="text-xl font-semibold mb-4">Riparazioni Attive</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {repairsWithDetails.map(({ repair, customer, motorcycle }) => (
-          <RepairCard 
+          <div 
             key={repair.id} 
-            repair={repair} 
-            customer={customer}
-            motorcycle={motorcycle}
-          />
+            onClick={() => handleRepairClick(repair.id)}
+            className="cursor-pointer transition-transform hover:scale-[1.02]"
+          >
+            <RepairCard 
+              repair={repair} 
+              customer={customer}
+              motorcycle={motorcycle}
+            />
+          </div>
         ))}
       </div>
 
