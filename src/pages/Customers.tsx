@@ -7,9 +7,28 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Search, ChevronRight } from 'lucide-react';
 import { customers, motorcycles } from '@/data/mockData';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogFooter, 
+  DialogHeader, 
+  DialogTitle 
+} from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
+import { Label } from '@/components/ui/label';
+import { Customer } from '@/types';
 
 const CustomersPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newCustomer, setNewCustomer] = useState<Partial<Customer>>({
+    name: '',
+    email: '',
+    phone: '',
+    address: '',
+  });
+  const { toast } = useToast();
 
   // Filter customers based on search term
   const filteredCustomers = customers.filter(customer => {
@@ -26,6 +45,39 @@ const CustomersPage = () => {
     return motorcycles.filter(m => m.customerId === customerId);
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewCustomer(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddCustomer = () => {
+    // Validate required fields
+    if (!newCustomer.name || !newCustomer.email || !newCustomer.phone) {
+      toast({
+        title: "Errore",
+        description: "I campi Nome, Email e Telefono sono obbligatori.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // In a real app, this would be an API call
+    // For now, we'll just show a success message
+    toast({
+      title: "Cliente aggiunto",
+      description: `${newCustomer.name} è stato aggiunto con successo.`,
+    });
+
+    // Reset form and close dialog
+    setNewCustomer({
+      name: '',
+      email: '',
+      phone: '',
+      address: '',
+    });
+    setIsDialogOpen(false);
+  };
+
   return (
     <Layout>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
@@ -40,7 +92,7 @@ const CustomersPage = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Button className="flex gap-1">
+          <Button className="flex gap-1" onClick={() => setIsDialogOpen(true)}>
             <Plus className="h-4 w-4" />
             Nuovo Cliente
           </Button>
@@ -106,6 +158,73 @@ const CustomersPage = () => {
           </div>
         )}
       </div>
+
+      {/* New Customer Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Aggiungi nuovo cliente</DialogTitle>
+            <DialogDescription>
+              Inserisci i dettagli del nuovo cliente. I campi con * sono obbligatori.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Nome*
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                className="col-span-3"
+                value={newCustomer.name}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="email" className="text-right">
+                Email*
+              </Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                className="col-span-3"
+                value={newCustomer.email}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="phone" className="text-right">
+                Telefono*
+              </Label>
+              <Input
+                id="phone"
+                name="phone"
+                className="col-span-3"
+                value={newCustomer.phone}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="address" className="text-right">
+                Indirizzo
+              </Label>
+              <Input
+                id="address"
+                name="address"
+                className="col-span-3"
+                value={newCustomer.address}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Annulla</Button>
+            <Button onClick={handleAddCustomer}>Salva</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
