@@ -167,10 +167,10 @@ const Workshop = () => {
             {t('workshop.readyToStartDesc')}
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Button size="lg" variant="secondary" onClick={() => navigate('/contact')} className="text-blue-900">
+            <Button size="lg" variant="secondary" onClick={() => navigate('/contact')} className="bg-white text-primary hover:bg-gray-100">
               {t('workshop.contactUs')}
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/register')} className="border-white hover:bg-white/10">
+            <Button size="lg" variant="outline" onClick={() => navigate('/register')} className="border-white text-white hover:bg-white/10">
               {t('workshop.register')}
             </Button>
             <Button size="lg" onClick={() => navigate('/dashboard')} className="bg-white text-blue-900 hover:bg-gray-100">
