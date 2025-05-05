@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -5,12 +6,18 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Wrench, Award, Clock, Check, Phone } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import LanguageSelector from '@/components/LanguageSelector';
+
 const Workshop = () => {
-  const {
-    t
-  } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
+  
   return <div className="min-h-screen bg-background">
+      {/* Language Selector */}
+      <div className="absolute top-4 right-4 z-20">
+        <LanguageSelector />
+      </div>
+
       {/* Hero Section */}
       <section className="relative bg-gradient-to-b from-motofix-blue to-blue-900 text-white py-20">
         <div className="container mx-auto px-4 relative z-10">
@@ -26,7 +33,7 @@ const Workshop = () => {
                 <Button size="lg" onClick={() => navigate('/services')} className="bg-white text-blue-900 hover:bg-gray-100">
                   {t('workshop.services')}
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => navigate('/contact')} className="border-white hover:bg-white/10 text-blue-900">
+                <Button size="lg" variant="outline" onClick={() => navigate('/contact')} className="border-white hover:bg-white/10">
                   {t('workshop.contact')}
                 </Button>
               </div>
@@ -163,8 +170,11 @@ const Workshop = () => {
             <Button size="lg" variant="secondary" onClick={() => navigate('/contact')} className="text-blue-900">
               {t('workshop.contactUs')}
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/register')} className="border-white hover:bg-white/10 text-blue-900">
+            <Button size="lg" variant="outline" onClick={() => navigate('/register')} className="border-white hover:bg-white/10">
               {t('workshop.register')}
+            </Button>
+            <Button size="lg" onClick={() => navigate('/dashboard')} className="bg-white text-blue-900 hover:bg-gray-100">
+              {t('app.nav.dashboard')}
             </Button>
           </div>
         </div>
