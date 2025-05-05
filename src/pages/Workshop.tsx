@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -7,11 +6,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Wrench, Award, Clock, Check, Phone } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import LanguageSelector from '@/components/LanguageSelector';
-
 const Workshop = () => {
-  const { t } = useTranslation();
+  const {
+    t
+  } = useTranslation();
   const navigate = useNavigate();
-  
   return <div className="min-h-screen bg-background">
       {/* Language Selector */}
       <div className="absolute top-4 right-4 z-20">
@@ -33,7 +32,7 @@ const Workshop = () => {
                 <Button size="lg" onClick={() => navigate('/services')} className="bg-white text-blue-900 hover:bg-gray-100">
                   {t('workshop.services')}
                 </Button>
-                <Button size="lg" variant="outline" onClick={() => navigate('/contact')} className="border-white hover:bg-white/10">
+                <Button size="lg" variant="outline" onClick={() => navigate('/contact')} className="border-white hover:bg-white/10 text-blue-900">
                   {t('workshop.contact')}
                 </Button>
               </div>
