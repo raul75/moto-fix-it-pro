@@ -7,9 +7,73 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Plus, Search, AlertTriangle } from 'lucide-react';
 import { inventoryParts } from '@/data/mockData';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
+import { InventoryPart } from '@/types';
 
 const InventoryPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const { toast } = useToast();
+
+  // New part form state
+  const [newPart, setNewPart] = useState<Partial<InventoryPart>>({
+    name: '',
+    partNumber: '',
+    price: 0,
+    cost: 0,
+    quantity: 0,
+    minimumQuantity: 0,
+    location: '',
+    supplier: ''
+  });
+
+  // Handle form input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    
+    // Convert numeric fields
+    if (['price', 'cost', 'quantity', 'minimumQuantity'].includes(name)) {
+      setNewPart(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
+    } else {
+      setNewPart(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  // Handle form submission
+  const handleSubmitNewPart = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Here you would normally add the part to the database
+    // For this mock, we'll just show a success toast
+    
+    toast({
+      title: "Ricambio aggiunto",
+      description: `${newPart.name} è stato aggiunto al magazzino.`,
+    });
+    
+    setDialogOpen(false);
+    
+    // Reset form
+    setNewPart({
+      name: '',
+      partNumber: '',
+      price: 0,
+      cost: 0,
+      quantity: 0,
+      minimumQuantity: 0,
+      location: '',
+      supplier: ''
+    });
+  };
 
   // Filter parts based on search term
   const filteredParts = inventoryParts.filter(part => {
@@ -23,6 +87,46 @@ const InventoryPage = () => {
   // Check if part is low stock
   const isLowStock = (part: typeof inventoryParts[0]) => {
     return part.quantity <= (part.minimumQuantity || 0);
+  };
+
+  // Export inventory to CSV
+  const exportInventory = () => {
+    const headers = ['Nome Ricambio', 'Codice', 'Prezzo', 'Costo', 'Quantità', 'Min Quantità', 'Posizione', 'Fornitore'];
+    
+    let csvContent = headers.join(',') + '\n';
+    
+    inventoryParts.forEach(part => {
+      const row = [
+        `"${part.name.replace(/"/g, '""')}"`,
+        `"${part.partNumber.replace(/"/g, '""')}"`,
+        part.price,
+        part.cost,
+        part.quantity,
+        part.minimumQuantity || 0,
+        `"${(part.location || '').replace(/"/g, '""')}"`,
+        `"${(part.supplier || '').replace(/"/g, '""')}"`
+      ];
+      
+      csvContent += row.join(',') + '\n';
+    });
+    
+    // Create blob and download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `inventario_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Inventario esportato",
+      description: "Il file CSV è stato scaricato.",
+    });
   };
 
   return (
@@ -39,7 +143,7 @@ const InventoryPage = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Button className="flex gap-1">
+          <Button className="flex gap-1" onClick={() => setDialogOpen(true)}>
             <Plus className="h-4 w-4" />
             Nuovo Ricambio
           </Button>
@@ -108,8 +212,130 @@ const InventoryPage = () => {
             Valore magazzino: €{inventoryParts.reduce((sum, part) => sum + (part.cost * part.quantity), 0).toFixed(2)}
           </p>
         </div>
-        <Button variant="outline">Esporta Inventario</Button>
+        <Button variant="outline" onClick={exportInventory}>Esporta Inventario</Button>
       </div>
+
+      {/* Dialog for new part */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Aggiungi Nuovo Ricambio</DialogTitle>
+            <DialogDescription>
+              Compila i dettagli per aggiungere un nuovo ricambio all'inventario.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleSubmitNewPart} className="space-y-4 py-4">
+            <div className="grid gap-4">
+              <div className="grid grid-cols-1 gap-2">
+                <Label htmlFor="name">Nome Ricambio *</Label>
+                <Input 
+                  id="name" 
+                  name="name"
+                  value={newPart.name} 
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 gap-2">
+                <Label htmlFor="partNumber">Codice *</Label>
+                <Input 
+                  id="partNumber" 
+                  name="partNumber"
+                  value={newPart.partNumber} 
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="price">Prezzo (€) *</Label>
+                  <Input 
+                    id="price" 
+                    name="price"
+                    type="number" 
+                    min="0" 
+                    step="0.01"
+                    value={newPart.price} 
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                
+                <div className="grid gap-2">
+                  <Label htmlFor="cost">Costo (€) *</Label>
+                  <Input 
+                    id="cost" 
+                    name="cost"
+                    type="number" 
+                    min="0" 
+                    step="0.01"
+                    value={newPart.cost} 
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="quantity">Quantità *</Label>
+                  <Input 
+                    id="quantity" 
+                    name="quantity"
+                    type="number" 
+                    min="0" 
+                    step="1"
+                    value={newPart.quantity} 
+                    onChange={handleInputChange}
+                    required
+                  />
+                </div>
+                
+                <div className="grid gap-2">
+                  <Label htmlFor="minimumQuantity">Scorta Minima</Label>
+                  <Input 
+                    id="minimumQuantity" 
+                    name="minimumQuantity"
+                    type="number" 
+                    min="0" 
+                    step="1"
+                    value={newPart.minimumQuantity} 
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="location">Posizione</Label>
+                <Input 
+                  id="location" 
+                  name="location"
+                  value={newPart.location} 
+                  onChange={handleInputChange}
+                />
+              </div>
+              
+              <div className="grid gap-2">
+                <Label htmlFor="supplier">Fornitore</Label>
+                <Input 
+                  id="supplier" 
+                  name="supplier"
+                  value={newPart.supplier} 
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Annulla</Button>
+              <Button type="submit">Salva Ricambio</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
