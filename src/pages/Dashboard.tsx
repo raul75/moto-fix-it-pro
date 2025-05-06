@@ -7,9 +7,11 @@ import RepairCard from '@/components/RepairCard';
 import { Wrench, Users, Package, Receipt, Plus } from 'lucide-react';
 import { repairs, getActiveRepairs, motorcycles, customers, inventoryParts, invoices, getLowStockParts } from '@/data/mockData';
 import { useNavigate } from 'react-router-dom';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const activeRepairs = getActiveRepairs();
   const lowStockParts = getLowStockParts();
   
@@ -56,16 +58,16 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
         <h1 className="text-2xl font-bold">Dashboard</h1>
-        <Button className="flex gap-1" onClick={handleNewRepairClick}>
+        <Button className="flex gap-1 w-full sm:w-auto justify-center" onClick={handleNewRepairClick}>
           <Plus className="h-4 w-4" />
           Nuova Riparazione
         </Button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <div onClick={() => handleCardClick('repairs')} className="cursor-pointer">
           <StatsCard 
             title="Riparazioni Attive"
@@ -101,7 +103,7 @@ const Dashboard = () => {
 
       {/* Active repairs section */}
       <h2 className="text-xl font-semibold mb-4">Riparazioni Attive</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {repairsWithDetails.map(({ repair, customer, motorcycle }) => (
           <div 
             key={repair.id} 
@@ -115,6 +117,11 @@ const Dashboard = () => {
             />
           </div>
         ))}
+        {repairsWithDetails.length === 0 && (
+          <div className="col-span-full text-center py-8">
+            <p className="text-muted-foreground">Nessuna riparazione attiva.</p>
+          </div>
+        )}
       </div>
 
       {/* Stats breakdown */}
@@ -159,13 +166,13 @@ const Dashboard = () => {
         
         <div className="bg-card p-4 rounded-lg border">
           <h3 className="font-semibold mb-2">Parti sotto scorta minima</h3>
-          <div className="space-y-2">
+          <div className="space-y-2 max-h-[200px] overflow-y-auto">
             {lowStockParts.length > 0 ? (
               lowStockParts.map(part => (
                 <div key={part.id} className="text-sm">
                   <div className="flex justify-between">
-                    <span>{part.name}</span>
-                    <span className="text-red-500 font-medium">{part.quantity} disponibili</span>
+                    <span className="truncate pr-2">{part.name}</span>
+                    <span className="text-red-500 font-medium whitespace-nowrap">{part.quantity} disponibili</span>
                   </div>
                   <div className="text-xs text-muted-foreground">
                     Min: {part.minimumQuantity}
@@ -180,18 +187,22 @@ const Dashboard = () => {
         
         <div className="bg-card p-4 rounded-lg border">
           <h3 className="font-semibold mb-2">Fatture recenti</h3>
-          <div className="space-y-2">
-            {invoices.map(invoice => (
-              <div key={invoice.id} className="text-sm">
-                <div className="flex justify-between">
-                  <span>#{invoice.number}</span>
-                  <span className="font-medium">€{invoice.total.toFixed(2)}</span>
+          <div className="space-y-2 max-h-[200px] overflow-y-auto">
+            {invoices.length > 0 ? (
+              invoices.map(invoice => (
+                <div key={invoice.id} className="text-sm">
+                  <div className="flex justify-between">
+                    <span className="truncate pr-2">#{invoice.number}</span>
+                    <span className="font-medium whitespace-nowrap">€{invoice.total.toFixed(2)}</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {invoice.date} - {invoice.status === 'paid' ? 'Pagata' : invoice.status === 'sent' ? 'Inviata' : invoice.status === 'overdue' ? 'Scaduta' : 'Bozza'}
+                  </div>
                 </div>
-                <div className="text-xs text-muted-foreground">
-                  {invoice.date} - {invoice.status === 'paid' ? 'Pagata' : invoice.status === 'sent' ? 'Inviata' : invoice.status === 'overdue' ? 'Scaduta' : 'Bozza'}
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground">Nessuna fattura recente</p>
+            )}
           </div>
         </div>
       </div>
