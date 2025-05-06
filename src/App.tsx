@@ -20,6 +20,8 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Workshop from "./pages/Workshop";
+import RepairsPage from "./pages/Repairs";
+import NewRepairPage from "./pages/NewRepair";
 
 const queryClient = new QueryClient();
 
@@ -70,6 +72,17 @@ const App = () => (
             <Route path="/photos" element={
               <ProtectedRoute roles={['admin', 'tecnico']}>
                 <PhotosPage />
+              </ProtectedRoute>
+            } />
+            {/* Add repairs routes */}
+            <Route path="/repairs" element={
+              <ProtectedRoute roles={['admin', 'tecnico']}>
+                <RepairsPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/repairs/new" element={
+              <ProtectedRoute roles={['admin', 'tecnico']}>
+                <NewRepairPage />
               </ProtectedRoute>
             } />
             <Route path="/repairs/:id" element={
