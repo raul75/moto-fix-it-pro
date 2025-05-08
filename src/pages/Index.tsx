@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,13 @@ const Index = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
   
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-accent/10 p-4">
@@ -30,20 +37,14 @@ const Index = () => {
         </p>
         
         <div className="flex flex-col space-y-4">
-          {isAuthenticated ? (
-            <Button size="lg" onClick={() => navigate('/dashboard')}>
-              {t('app.nav.dashboard')} →
+          <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 justify-center">
+            <Button size="lg" onClick={() => navigate('/login')}>
+              {t('auth.login')}
             </Button>
-          ) : (
-            <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 justify-center">
-              <Button size="lg" onClick={() => navigate('/login')}>
-                {t('auth.login')}
-              </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate('/register')}>
-                {t('auth.register')}
-              </Button>
-            </div>
-          )}
+            <Button size="lg" variant="outline" onClick={() => navigate('/register')}>
+              {t('auth.register')}
+            </Button>
+          </div>
           
           <Button 
             variant="secondary" 

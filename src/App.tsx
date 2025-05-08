@@ -34,7 +34,7 @@ const App = () => (
         <AuthProvider>
           <Routes>
             {/* Pagine pubbliche */}
-            <Route path="/" element={<Workshop />} />
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/index" element={<Index />} />
             <Route path="/workshop" element={<Workshop />} />
             <Route path="/login" element={<Login />} />
