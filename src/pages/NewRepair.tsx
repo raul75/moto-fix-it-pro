@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,6 +27,7 @@ import {
 import { ChevronLeft, Plus } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { customers, motorcycles } from '@/data/mockData';
+import { Customer } from '@/types'; // Import the Customer type
 import { 
   Dialog,
   DialogContent, 
@@ -67,7 +67,7 @@ const NewRepairPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isNewCustomerDialogOpen, setIsNewCustomerDialogOpen] = useState(false);
-  const [customersList, setCustomersList] = useState([...customers]);
+  const [customersList, setCustomersList] = useState<Customer[]>([...customers]);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -108,16 +108,18 @@ const NewRepairPage = () => {
   }
   
   function onCreateCustomer(values: z.infer<typeof newCustomerSchema>) {
-    // In a real app, this would make an API call to create the customer
-    const newCustomer = {
+    // Create new customer with all required fields of Customer type
+    const newCustomer: Customer = {
       id: `c-${Date.now()}`,
-      ...values,
-      address: "",
+      name: values.name,
+      email: values.email,
+      phone: values.phone,
+      address: "", // Provide default value for required field
       createdAt: new Date().toISOString()
     };
     
     // Update local customers list
-    const updatedCustomers = [...customersList, newCustomer];
+    const updatedCustomers: Customer[] = [...customersList, newCustomer];
     setCustomersList(updatedCustomers);
     
     // Update the form with the new customer
