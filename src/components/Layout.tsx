@@ -17,8 +17,8 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarTrigger,
-  SidebarRail
+  SidebarRail,
+  SidebarTrigger
 } from './ui/sidebar';
 
 type LayoutProps = {
@@ -104,6 +104,19 @@ const Layout = ({ children }: LayoutProps) => {
                       <NavLink to="/customers">
                         <Users className="h-5 w-5" />
                         <span>{t('app.nav.customers')}</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  
+                  <SidebarMenuItem>
+                    <SidebarMenuButton 
+                      tooltip={t('app.nav.repairs')}
+                      isActive={isActive('/repairs')}
+                      asChild
+                    >
+                      <NavLink to="/repairs">
+                        <Wrench className="h-5 w-5" />
+                        <span>Riparazioni</span>
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>

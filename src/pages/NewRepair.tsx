@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -25,9 +25,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Plus } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { customers, motorcycles } from '@/data/mockData';
+import { 
+  Dialog,
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle,
+  DialogFooter
+} from '@/components/ui/dialog';
 
 const formSchema = z.object({
   title: z.string().min(3, {
@@ -44,9 +51,23 @@ const formSchema = z.object({
   }),
 });
 
+const newCustomerSchema = z.object({
+  name: z.string().min(2, {
+    message: "Il nome deve essere di almeno 2 caratteri",
+  }),
+  email: z.string().email({
+    message: "Inserisci un'email valida",
+  }),
+  phone: z.string().min(5, {
+    message: "Il numero di telefono deve essere di almeno 5 caratteri",
+  }),
+});
+
 const NewRepairPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isNewCustomerDialogOpen, setIsNewCustomerDialogOpen] = useState(false);
+  const [customersList, setCustomersList] = useState([...customers]);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -55,6 +76,15 @@ const NewRepairPage = () => {
       description: "",
       customerId: "",
       motorcycleId: "",
+    },
+  });
+  
+  const newCustomerForm = useForm<z.infer<typeof newCustomerSchema>>({
+    resolver: zodResolver(newCustomerSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
     },
   });
   
@@ -75,6 +105,33 @@ const NewRepairPage = () => {
     
     // Navigate back to repairs list
     navigate('/repairs');
+  }
+  
+  function onCreateCustomer(values: z.infer<typeof newCustomerSchema>) {
+    // In a real app, this would make an API call to create the customer
+    const newCustomer = {
+      id: `c-${Date.now()}`,
+      ...values,
+      address: "",
+      createdAt: new Date().toISOString()
+    };
+    
+    // Update local customers list
+    const updatedCustomers = [...customersList, newCustomer];
+    setCustomersList(updatedCustomers);
+    
+    // Update the form with the new customer
+    form.setValue('customerId', newCustomer.id);
+    
+    // Show success toast
+    toast({
+      title: "Cliente creato",
+      description: "Il nuovo cliente è stato creato con successo.",
+    });
+    
+    // Close dialog
+    setIsNewCustomerDialogOpen(false);
+    newCustomerForm.reset();
   }
 
   return (
@@ -99,36 +156,47 @@ const NewRepairPage = () => {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="customerId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Cliente</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
-                        value={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Seleziona un cliente" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {customers.map(customer => (
-                            <SelectItem key={customer.id} value={customer.id}>
-                              {customer.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>
-                        Il cliente proprietario della moto
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="space-y-2">
+                  <FormField
+                    control={form.control}
+                    name="customerId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Cliente</FormLabel>
+                        <div className="flex gap-2">
+                          <Select 
+                            onValueChange={field.onChange} 
+                            value={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="flex-1">
+                                <SelectValue placeholder="Seleziona un cliente" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {customersList.map(customer => (
+                                <SelectItem key={customer.id} value={customer.id}>
+                                  {customer.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Button 
+                            type="button" 
+                            size="icon"
+                            onClick={() => setIsNewCustomerDialogOpen(true)}
+                          >
+                            <Plus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <FormDescription>
+                          Il cliente proprietario della moto
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 
                 <FormField
                   control={form.control}
@@ -215,6 +283,72 @@ const NewRepairPage = () => {
           </Form>
         </CardContent>
       </Card>
+      
+      {/* New Customer Dialog */}
+      <Dialog open={isNewCustomerDialogOpen} onOpenChange={setIsNewCustomerDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Crea Nuovo Cliente</DialogTitle>
+          </DialogHeader>
+          
+          <Form {...newCustomerForm}>
+            <form onSubmit={newCustomerForm.handleSubmit(onCreateCustomer)} className="space-y-4 pt-2">
+              <FormField
+                control={newCustomerForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nome completo" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={newCustomerForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="cliente@esempio.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={newCustomerForm.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Telefono</FormLabel>
+                    <FormControl>
+                      <Input placeholder="+39 123 456 7890" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <DialogFooter className="pt-4">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsNewCustomerDialogOpen(false)}
+                >
+                  Annulla
+                </Button>
+                <Button type="submit">Crea Cliente</Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
