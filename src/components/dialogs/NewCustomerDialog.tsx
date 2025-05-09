@@ -3,32 +3,35 @@ import React from 'react';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import NewCustomerForm, { NewCustomerFormValues } from '../forms/NewCustomerForm';
+import NewCustomerForm, { NewCustomerFormValues } from '@/components/forms/NewCustomerForm';
 
 type NewCustomerDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (values: NewCustomerFormValues) => void;
+  isLoading?: boolean;
 };
 
-const NewCustomerDialog = ({ open, onOpenChange, onSubmit }: NewCustomerDialogProps) => {
+const NewCustomerDialog = ({
+  open,
+  onOpenChange,
+  onSubmit,
+  isLoading = false
+}: NewCustomerDialogProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Crea Nuovo Cliente</DialogTitle>
-          <DialogDescription>
-            Inserisci i dettagli del nuovo cliente. I campi con * sono obbligatori.
-          </DialogDescription>
+          <DialogTitle>Nuovo Cliente</DialogTitle>
         </DialogHeader>
         
         <NewCustomerForm 
-          onSubmit={onSubmit} 
-          onCancel={() => onOpenChange(false)} 
+          onSubmit={onSubmit}
+          onCancel={() => onOpenChange(false)}
+          isLoading={isLoading}
         />
       </DialogContent>
     </Dialog>

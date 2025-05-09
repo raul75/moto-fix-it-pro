@@ -1,93 +1,158 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeft } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
-import { customers, motorcycles } from '@/data/mockData';
 import { Customer, Motorcycle } from '@/types';
 import NewCustomerDialog from '@/components/dialogs/NewCustomerDialog';
 import RepairForm, { RepairFormValues } from '@/components/forms/RepairForm';
 import { NewCustomerFormValues } from '@/components/forms/NewCustomerForm';
 import { createCustomer } from '@/utils/customerUtils';
 import { createMotorcycle } from '@/utils/motorcycleUtils';
+import { getCustomers } from '@/api/customers';
+import { getMotorcycles } from '@/api/motorcycles';
+import { createRepairInDb, uploadPhotoToRepair } from '@/api/repairs';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const NewRepairPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [isNewCustomerDialogOpen, setIsNewCustomerDialogOpen] = useState(false);
-  const [customersList, setCustomersList] = useState<Customer[]>([...customers]);
-  const [motorcyclesList, setMotorcyclesList] = useState<Motorcycle[]>([...motorcycles]);
+
+  // Fetch customers and motorcycles with React Query
+  const { data: customersList = [] } = useQuery({
+    queryKey: ['customers'],
+    queryFn: getCustomers,
+    initialData: []
+  });
+
+  const { data: motorcyclesList = [] } = useQuery({
+    queryKey: ['motorcycles'],
+    queryFn: getMotorcycles,
+    initialData: []
+  });
+
+  // Create repair mutation
+  const createRepairMutation = useMutation({
+    mutationFn: async (values: RepairFormValues) => {
+      // Handle new motorcycle creation if needed
+      let motorcycleId = values.motorcycleId;
+      if (!motorcycleId && values.newMotorcycle) {
+        // Make sure all required fields are available before creating a new motorcycle
+        if (
+          values.customerId && 
+          values.newMotorcycle.make && 
+          values.newMotorcycle.model && 
+          values.newMotorcycle.year && 
+          values.newMotorcycle.licensePlate
+        ) {
+          // Create a new motorcycle and get its ID
+          const newMotorcycle = await createMotorcycle({
+            make: values.newMotorcycle.make,
+            model: values.newMotorcycle.model,
+            year: values.newMotorcycle.year,
+            licensePlate: values.newMotorcycle.licensePlate,
+            vin: values.newMotorcycle.vin,
+            customerId: values.customerId
+          });
+          
+          motorcycleId = newMotorcycle.id;
+          
+          // Invalidate motorcycles query to refresh data
+          queryClient.invalidateQueries({ queryKey: ['motorcycles'] });
+          
+          toast({
+            title: "Motocicletta creata",
+            description: "La nuova motocicletta è stata aggiunta con successo.",
+          });
+        } else {
+          throw new Error("Dati della moto incompleti");
+        }
+      }
+
+      // Ensure we have a motorcycle ID
+      if (!motorcycleId) {
+        throw new Error("È necessario selezionare o creare una moto");
+      }
+      
+      // Create the repair
+      const newRepair = await createRepairInDb({
+        motorcycleId,
+        customerId: values.customerId,
+        title: values.title,
+        description: values.description,
+        status: 'pending'
+      });
+      
+      // Handle photo upload if present
+      if (values.intakePhoto) {
+        await uploadPhotoToRepair(
+          newRepair.id,
+          values.intakePhoto,
+          "Foto di ingresso"
+        );
+      }
+      
+      return newRepair;
+    },
+    onSuccess: () => {
+      // Invalidate repairs query to refresh the data
+      queryClient.invalidateQueries({ queryKey: ['repairs'] });
+      
+      // Show success toast
+      toast({
+        title: "Riparazione creata",
+        description: "La nuova riparazione è stata creata con successo.",
+      });
+      
+      // Navigate back to repairs list
+      navigate('/repairs');
+    },
+    onError: (error) => {
+      console.error("Error creating repair:", error);
+      toast({
+        title: "Errore nella creazione",
+        description: error instanceof Error ? error.message : "Si è verificato un errore",
+        variant: "destructive"
+      });
+    }
+  });
+  
+  // Create customer mutation
+  const createCustomerMutation = useMutation({
+    mutationFn: createCustomer,
+    onSuccess: (newCustomer) => {
+      // Update local customers list via query invalidation
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      
+      // Show success toast
+      toast({
+        title: "Cliente creato",
+        description: "Il nuovo cliente è stato creato con successo.",
+      });
+      
+      // Close dialog
+      setIsNewCustomerDialogOpen(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "Errore nella creazione",
+        description: error instanceof Error ? error.message : "Si è verificato un errore",
+        variant: "destructive"
+      });
+    }
+  });
 
   function onSubmit(values: RepairFormValues) {
-    console.log("Form submitted:", values);
-    
-    // Handle new motorcycle creation if needed
-    let motorcycleId = values.motorcycleId;
-    if (!motorcycleId && values.newMotorcycle) {
-      // Make sure all required fields are available before creating a new motorcycle
-      if (
-        values.customerId && 
-        values.newMotorcycle.make && 
-        values.newMotorcycle.model && 
-        values.newMotorcycle.year && 
-        values.newMotorcycle.licensePlate
-      ) {
-        // Create a new motorcycle and get its ID
-        const newMotorcycle = createMotorcycle({
-          make: values.newMotorcycle.make,
-          model: values.newMotorcycle.model,
-          year: values.newMotorcycle.year,
-          licensePlate: values.newMotorcycle.licensePlate,
-          vin: values.newMotorcycle.vin,
-          customerId: values.customerId
-        });
-        
-        // Add to local state
-        setMotorcyclesList([...motorcyclesList, newMotorcycle]);
-        motorcycleId = newMotorcycle.id;
-        
-        toast({
-          title: "Motocicletta creata",
-          description: "La nuova motocicletta è stata aggiunta con successo.",
-        });
-      }
-    }
-    
-    // Handle photo upload (in a real app, this would be an API call)
-    if (values.intakePhoto) {
-      console.log("Photo to upload:", values.intakePhoto);
-      // In a real app, you would upload the photo to a server here
-    }
-    
-    // Show success toast
-    toast({
-      title: "Riparazione creata",
-      description: "La nuova riparazione è stata creata con successo.",
-    });
-    
-    // Navigate back to repairs list
-    navigate('/repairs');
+    createRepairMutation.mutate(values);
   }
   
   function onCreateCustomer(values: NewCustomerFormValues) {
-    // Create new customer
-    const newCustomer = createCustomer(values);
-    
-    // Update local customers list
-    const updatedCustomers: Customer[] = [...customersList, newCustomer];
-    setCustomersList(updatedCustomers);
-    
-    // Show success toast
-    toast({
-      title: "Cliente creato",
-      description: "Il nuovo cliente è stato creato con successo.",
-    });
-    
-    // Close dialog
-    setIsNewCustomerDialogOpen(false);
+    createCustomerMutation.mutate(values);
   }
 
   return (
@@ -115,6 +180,7 @@ const NewRepairPage = () => {
             onSubmit={onSubmit}
             onCancel={() => navigate('/repairs')}
             onNewCustomerClick={() => setIsNewCustomerDialogOpen(true)}
+            isLoading={createRepairMutation.isPending}
           />
         </CardContent>
       </Card>
@@ -124,6 +190,7 @@ const NewRepairPage = () => {
         open={isNewCustomerDialogOpen}
         onOpenChange={setIsNewCustomerDialogOpen}
         onSubmit={onCreateCustomer}
+        isLoading={createCustomerMutation.isPending}
       />
     </Layout>
   );

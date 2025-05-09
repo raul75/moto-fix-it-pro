@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from '@/components/ui/button';
 import { Customer, Motorcycle } from '@/types';
-import { Plus, Upload, Bike, Image } from 'lucide-react';
+import { Plus, Upload, Bike, Image, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -70,6 +69,7 @@ type RepairFormProps = {
   onSubmit: (values: RepairFormValues) => void;
   onCancel: () => void;
   onNewCustomerClick: () => void;
+  isLoading?: boolean;
 };
 
 const RepairForm = ({ 
@@ -77,7 +77,8 @@ const RepairForm = ({
   motorcycles, 
   onSubmit, 
   onCancel, 
-  onNewCustomerClick 
+  onNewCustomerClick,
+  isLoading = false 
 }: RepairFormProps) => {
   const [motorcycleTab, setMotorcycleTab] = useState<string>("existing");
   const [uploadedPhotoURL, setUploadedPhotoURL] = useState<string | null>(null);
@@ -130,6 +131,7 @@ const RepairForm = ({
                     <Select 
                       onValueChange={field.onChange} 
                       value={field.value}
+                      disabled={isLoading}
                     >
                       <FormControl>
                         <SelectTrigger className="flex-1">
@@ -148,6 +150,7 @@ const RepairForm = ({
                       type="button" 
                       size="icon"
                       onClick={onNewCustomerClick}
+                      disabled={isLoading}
                     >
                       <Plus className="h-4 w-4" />
                     </Button>
@@ -166,8 +169,8 @@ const RepairForm = ({
             <FormLabel>Motocicletta</FormLabel>
             <Tabs value={motorcycleTab} onValueChange={setMotorcycleTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="existing">Esistente</TabsTrigger>
-                <TabsTrigger value="new">Nuova</TabsTrigger>
+                <TabsTrigger value="existing" disabled={isLoading}>Esistente</TabsTrigger>
+                <TabsTrigger value="new" disabled={isLoading}>Nuova</TabsTrigger>
               </TabsList>
               
               <TabsContent value="existing">
@@ -189,7 +192,7 @@ const RepairForm = ({
                           });
                         }} 
                         value={field.value}
-                        disabled={!watchCustomerId || customerMotorcycles.length === 0}
+                        disabled={!watchCustomerId || customerMotorcycles.length === 0 || isLoading}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -225,7 +228,7 @@ const RepairForm = ({
                           <FormItem>
                             <FormLabel>Marca</FormLabel>
                             <FormControl>
-                              <Input placeholder="Honda, Yamaha, ecc." {...field} />
+                              <Input placeholder="Honda, Yamaha, ecc." {...field} disabled={isLoading} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -238,7 +241,7 @@ const RepairForm = ({
                           <FormItem>
                             <FormLabel>Modello</FormLabel>
                             <FormControl>
-                              <Input placeholder="CBR, MT-07, ecc." {...field} />
+                              <Input placeholder="CBR, MT-07, ecc." {...field} disabled={isLoading} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -254,7 +257,7 @@ const RepairForm = ({
                           <FormItem>
                             <FormLabel>Anno</FormLabel>
                             <FormControl>
-                              <Input placeholder="2023" {...field} />
+                              <Input placeholder="2023" {...field} disabled={isLoading} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -267,7 +270,7 @@ const RepairForm = ({
                           <FormItem>
                             <FormLabel>Targa</FormLabel>
                             <FormControl>
-                              <Input placeholder="AB123CD" {...field} />
+                              <Input placeholder="AB123CD" {...field} disabled={isLoading} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -282,7 +285,7 @@ const RepairForm = ({
                         <FormItem>
                           <FormLabel>Numero di Telaio (VIN)</FormLabel>
                           <FormControl>
-                            <Input placeholder="Opzionale" {...field} />
+                            <Input placeholder="Opzionale" {...field} disabled={isLoading} />
                           </FormControl>
                           <FormDescription>
                             Il numero di telaio della moto (opzionale)
@@ -305,7 +308,7 @@ const RepairForm = ({
             <FormItem>
               <FormLabel>Titolo</FormLabel>
               <FormControl>
-                <Input placeholder="Es. Manutenzione programmata" {...field} />
+                <Input placeholder="Es. Manutenzione programmata" {...field} disabled={isLoading} />
               </FormControl>
               <FormDescription>
                 Un titolo breve per la riparazione
@@ -326,6 +329,7 @@ const RepairForm = ({
                   placeholder="Descrivi il problema o l'intervento da effettuare" 
                   className="resize-none min-h-[120px]"
                   {...field} 
+                  disabled={isLoading}
                 />
               </FormControl>
               <FormDescription>
@@ -351,6 +355,7 @@ const RepairForm = ({
                       variant="outline"
                       onClick={() => document.getElementById('photo-upload')?.click()}
                       className="w-full"
+                      disabled={isLoading}
                     >
                       <Upload className="mr-2 h-4 w-4" /> Carica Foto
                     </Button>
@@ -360,6 +365,7 @@ const RepairForm = ({
                       accept="image/*"
                       className="hidden"
                       onChange={handlePhotoChange}
+                      disabled={isLoading}
                       {...field}
                     />
                   </div>
@@ -388,10 +394,23 @@ const RepairForm = ({
             type="button" 
             variant="outline" 
             onClick={onCancel}
+            disabled={isLoading}
           >
             Annulla
           </Button>
-          <Button type="submit">Crea Riparazione</Button>
+          <Button 
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creazione in corso...
+              </>
+            ) : (
+              "Crea Riparazione"
+            )}
+          </Button>
         </div>
       </form>
     </Form>

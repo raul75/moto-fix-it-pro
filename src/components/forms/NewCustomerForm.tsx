@@ -14,7 +14,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { DialogFooter } from '@/components/ui/dialog';
-import { Customer } from '@/types';
+import { Loader2 } from 'lucide-react';
 
 export const newCustomerSchema = z.object({
   name: z.string().min(2, {
@@ -31,11 +31,12 @@ export const newCustomerSchema = z.object({
 type NewCustomerFormProps = {
   onSubmit: (values: z.infer<typeof newCustomerSchema>) => void;
   onCancel: () => void;
+  isLoading?: boolean;
 };
 
 export type NewCustomerFormValues = z.infer<typeof newCustomerSchema>;
 
-const NewCustomerForm = ({ onSubmit, onCancel }: NewCustomerFormProps) => {
+const NewCustomerForm = ({ onSubmit, onCancel, isLoading = false }: NewCustomerFormProps) => {
   const form = useForm<z.infer<typeof newCustomerSchema>>({
     resolver: zodResolver(newCustomerSchema),
     defaultValues: {
@@ -55,7 +56,7 @@ const NewCustomerForm = ({ onSubmit, onCancel }: NewCustomerFormProps) => {
             <FormItem>
               <FormLabel>Nome</FormLabel>
               <FormControl>
-                <Input placeholder="Nome completo" {...field} />
+                <Input placeholder="Nome completo" {...field} disabled={isLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -69,7 +70,7 @@ const NewCustomerForm = ({ onSubmit, onCancel }: NewCustomerFormProps) => {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="cliente@esempio.com" {...field} />
+                <Input type="email" placeholder="cliente@esempio.com" {...field} disabled={isLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -83,7 +84,7 @@ const NewCustomerForm = ({ onSubmit, onCancel }: NewCustomerFormProps) => {
             <FormItem>
               <FormLabel>Telefono</FormLabel>
               <FormControl>
-                <Input placeholder="+39 123 456 7890" {...field} />
+                <Input placeholder="+39 123 456 7890" {...field} disabled={isLoading} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -95,10 +96,20 @@ const NewCustomerForm = ({ onSubmit, onCancel }: NewCustomerFormProps) => {
             type="button" 
             variant="outline" 
             onClick={onCancel}
+            disabled={isLoading}
           >
             Annulla
           </Button>
-          <Button type="submit">Crea Cliente</Button>
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creazione...
+              </>
+            ) : (
+              "Crea Cliente"
+            )}
+          </Button>
         </DialogFooter>
       </form>
     </Form>
