@@ -27,20 +27,33 @@ const NewRepairPage = () => {
     // Handle new motorcycle creation if needed
     let motorcycleId = values.motorcycleId;
     if (!motorcycleId && values.newMotorcycle) {
-      // Create a new motorcycle and get its ID
-      const newMotorcycle = createMotorcycle({
-        ...values.newMotorcycle,
-        customerId: values.customerId
-      });
-      
-      // Add to local state
-      setMotorcyclesList([...motorcyclesList, newMotorcycle]);
-      motorcycleId = newMotorcycle.id;
-      
-      toast({
-        title: "Motocicletta creata",
-        description: "La nuova motocicletta è stata aggiunta con successo.",
-      });
+      // Make sure all required fields are available before creating a new motorcycle
+      if (
+        values.customerId && 
+        values.newMotorcycle.make && 
+        values.newMotorcycle.model && 
+        values.newMotorcycle.year && 
+        values.newMotorcycle.licensePlate
+      ) {
+        // Create a new motorcycle and get its ID
+        const newMotorcycle = createMotorcycle({
+          make: values.newMotorcycle.make,
+          model: values.newMotorcycle.model,
+          year: values.newMotorcycle.year,
+          licensePlate: values.newMotorcycle.licensePlate,
+          vin: values.newMotorcycle.vin,
+          customerId: values.customerId
+        });
+        
+        // Add to local state
+        setMotorcyclesList([...motorcyclesList, newMotorcycle]);
+        motorcycleId = newMotorcycle.id;
+        
+        toast({
+          title: "Motocicletta creata",
+          description: "La nuova motocicletta è stata aggiunta con successo.",
+        });
+      }
     }
     
     // Handle photo upload (in a real app, this would be an API call)
