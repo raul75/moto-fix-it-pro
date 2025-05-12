@@ -1,165 +1,133 @@
-
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { User, UserRole } from '@/types';
-import { toast } from 'sonner';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
+import { User, UserRole } from '@/types';
+import { signUp, signIn, signOut, getCurrentUser } from '@/api/auth';
+import supabase from '@/lib/supabase';
 
-// Dati di esempio per gli utenti
-const MOCK_USERS = [
-  {
-    id: "1",
-    email: "admin@motofix.it",
-    password: "admin123",
-    name: "Amministratore",
-    role: "admin" as UserRole,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "2",
-    email: "tecnico@motofix.it",
-    password: "tecnico123",
-    name: "Tecnico Demo",
-    role: "tecnico" as UserRole,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "3",
-    email: "cliente@motofix.it",
-    password: "cliente123",
-    name: "Cliente Demo",
-    role: "cliente" as UserRole,
-    customerId: "1", // ID collegato a un cliente esistente
-    createdAt: new Date().toISOString(),
-  }
-];
-
-type AuthContextType = {
+interface AuthContextProps {
   user: User | null;
+  isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
+  logout: () => Promise<void>;
   register: (email: string, password: string, name: string, role?: UserRole) => Promise<boolean>;
-  isAuthenticated: boolean;
   hasRole: (roles: UserRole | UserRole[]) => boolean;
-};
+}
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  isLoading: true,
-  login: async () => false,
-  logout: () => {},
-  register: async () => false,
-  isAuthenticated: false,
-  hasRole: () => false,
-});
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
 
-export const useAuth = () => useContext(AuthContext);
+const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
-export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }) => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  const { t } = useTranslation();
-  
+
   useEffect(() => {
-    // Controlla se esiste un utente nel localStorage
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
+    setIsLoading(true);
+    
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log("Auth state changed:", event);
+        setUser(session?.user ? {
+          id: session.user.id,
+          email: session.user.email || '',
+          name: session.user.user_metadata.name || '',
+          role: (session.user.user_metadata.role as UserRole) || 'cliente',
+          createdAt: session.user.created_at || '',
+          customerId: session.user.user_metadata.role === 'cliente' ? session.user.id : undefined,
+          lastLogin: new Date().toISOString()
+        } : null);
+        setIsAuthenticated(!!session);
+        setIsLoading(false);
+      }
+    );
+    
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ? {
+        id: session.user.id,
+        email: session.user.email || '',
+        name: session.user.user_metadata.name || '',
+        role: (session.user.user_metadata.role as UserRole) || 'cliente',
+        createdAt: session.user.created_at || '',
+        customerId: session.user.user_metadata.role === 'cliente' ? session.user.id : undefined,
+        lastLogin: new Date().toISOString()
+      } : null);
+      setIsAuthenticated(!!session);
+      setIsLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      // In un'app reale qui ci sarebbe una chiamata API
-      const foundUser = MOCK_USERS.find(u => u.email === email && u.password === password);
-      
-      if (!foundUser) {
-        toast.error(t('auth.loginError'));
-        return false;
-      }
-      
-      // Crea oggetto utente senza la password
-      const { password: _, ...userWithoutPassword } = foundUser;
-      const authenticatedUser = {
-        ...userWithoutPassword,
-        lastLogin: new Date().toISOString()
-      };
-      
-      // Salva l'utente nel localStorage e nello stato
-      localStorage.setItem('user', JSON.stringify(authenticatedUser));
-      setUser(authenticatedUser);
-      
-      toast.success(t('auth.loginSuccess'));
+      const loggedInUser = await signIn(email, password);
+      setUser(loggedInUser);
+      setIsAuthenticated(true);
       return true;
-    } catch (error) {
-      console.error("Login error:", error);
-      toast.error(t('auth.loginError'));
+    } catch (error: any) {
+      console.error("Login failed:", error.message);
       return false;
+    } finally {
+      setIsLoading(false);
     }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('user');
-    setUser(null);
-    navigate('/login');
-    toast.success(t('auth.logoutSuccess'));
   };
 
   const register = async (email: string, password: string, name: string, role: UserRole = 'cliente'): Promise<boolean> => {
     try {
-      // Verifica che l'email non sia già in uso
-      const emailExists = MOCK_USERS.some(u => u.email === email);
-      
-      if (emailExists) {
-        toast.error(t('auth.emailInUse'));
-        return false;
-      }
-      
-      // In un'app reale qui ci sarebbe una chiamata API
-      const newUser = {
-        id: `${MOCK_USERS.length + 1}`,
-        email,
-        password,
-        name,
-        role,
-        createdAt: new Date().toISOString()
-      };
-      
-      // Aggiunge l'utente all'array (simulazione)
-      // MOCK_USERS.push(newUser);
-      
-      toast.success(t('auth.registerSuccess'));
+      const newUser = await signUp(email, password, name, role);
+      setUser(newUser);
+      setIsAuthenticated(true);
       return true;
-    } catch (error) {
-      console.error("Registration error:", error);
-      toast.error(t('auth.registerError'));
+    } catch (error: any) {
+      console.error("Registration failed:", error.message);
       return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const logout = async (): Promise<void> => {
+    try {
+      await signOut();
+      setUser(null);
+      setIsAuthenticated(false);
+      navigate('/login');
+    } catch (error: any) {
+      console.error("Logout failed:", error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const hasRole = (roles: UserRole | UserRole[]): boolean => {
     if (!user) return false;
-    
+
     if (Array.isArray(roles)) {
       return roles.includes(user.role);
+    } else {
+      return user.role === roles;
     }
-    
-    return user.role === roles;
   };
 
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        isLoading, 
-        login, 
-        logout, 
-        register, 
-        isAuthenticated: !!user,
-        hasRole
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated,
+        isLoading,
+        login,
+        logout,
+        register,
+        hasRole,
       }}
     >
       {children}
@@ -167,3 +135,10 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
   );
 };
 
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};

@@ -12,7 +12,7 @@ window.addEventListener('error', (event) => {
   
   // Check if it's a Supabase-related error
   if (event.error?.message?.includes('Supabase')) {
-    console.warn('Supabase connection issue detected. Check your environment variables and connection settings.');
+    console.warn('Supabase connection issue detected. Check your connection settings.');
   }
 });
 
