@@ -21,6 +21,7 @@ import { useAuth } from '@/context/AuthContext';
 import LanguageSelector from '@/components/LanguageSelector';
 import { Wrench } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const Login = () => {
   const { t } = useTranslation();
@@ -28,6 +29,7 @@ const Login = () => {
   const { login, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
   
   // Redirect se l'utente è già autenticato
   React.useEffect(() => {
@@ -53,12 +55,20 @@ const Login = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      setLoginError(null);
       setIsLoading(true);
+      
+      console.log("Login attempt with:", values.email);
       const success = await login(values.email, values.password);
       
       if (success) {
+        toast({
+          title: t('auth.loginSuccess'),
+          description: t('auth.welcomeBack'),
+        });
         navigate('/');
       } else {
+        setLoginError(t('auth.invalidCredentials'));
         toast({
           title: t('auth.loginFailed'),
           description: t('auth.checkCredentials'),
@@ -67,6 +77,47 @@ const Login = () => {
       }
     } catch (error) {
       console.error('Login error:', error);
+      setLoginError(error instanceof Error ? error.message : t('auth.unknownError'));
+      toast({
+        title: t('auth.loginFailed'),
+        description: error instanceof Error ? error.message : t('auth.unknownError'),
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Function to handle demo login
+  const handleDemoLogin = async () => {
+    try {
+      setLoginError(null);
+      setIsLoading(true);
+      
+      // Since this is just for demonstration, use test credentials
+      const demoEmail = "demo@motofix.it";
+      const demoPassword = "demo123";
+      
+      console.log("Demo login attempt");
+      const success = await login(demoEmail, demoPassword);
+      
+      if (success) {
+        toast({
+          title: t('auth.demoLoginSuccess'),
+          description: t('auth.welcomeToDemo'),
+        });
+        navigate('/');
+      } else {
+        setLoginError(t('auth.demoLoginFailed'));
+        toast({
+          title: t('auth.demoLoginFailed'),
+          description: t('auth.contactAdmin'),
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Demo login error:', error);
+      setLoginError(error instanceof Error ? error.message : t('auth.unknownError'));
       toast({
         title: t('auth.loginFailed'),
         description: error instanceof Error ? error.message : t('auth.unknownError'),
@@ -99,6 +150,12 @@ const Login = () => {
           <CardDescription>{t('auth.loginDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
+          {loginError && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertDescription>{loginError}</AlertDescription>
+            </Alert>
+          )}
+          
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -132,10 +189,24 @@ const Login = () => {
               </Button>
             </form>
           </Form>
+          
+          <div className="mt-4">
+            <Button 
+              variant="outline" 
+              className="w-full" 
+              onClick={handleDemoLogin}
+              disabled={isLoading}
+            >
+              {t('auth.demoLogin')}
+            </Button>
+          </div>
         </CardContent>
-        <CardFooter className="flex justify-center">
+        <CardFooter className="flex flex-col gap-2">
           <p>
             {t('auth.noAccount')} <Link to="/register" className="text-primary hover:underline">{t('auth.registerHere')}</Link>
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {t('auth.demoNote')}
           </p>
         </CardFooter>
       </Card>

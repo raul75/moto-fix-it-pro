@@ -1,2 +1,6 @@
 
 project_id = "eleoevzkclsttkhfixwu"
+
+[auth]
+# Set this to enable email confirmations
+enable_email_confirm = false
