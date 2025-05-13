@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -20,11 +20,14 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useAuth } from '@/context/AuthContext';
 import LanguageSelector from '@/components/LanguageSelector';
 import { Wrench } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   
   // Redirect se l'utente è già autenticato
   React.useEffect(() => {
@@ -49,9 +52,28 @@ const Login = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const success = await login(values.email, values.password);
-    if (success) {
-      navigate('/');
+    try {
+      setIsLoading(true);
+      const success = await login(values.email, values.password);
+      
+      if (success) {
+        navigate('/');
+      } else {
+        toast({
+          title: t('auth.loginFailed'),
+          description: t('auth.checkCredentials'),
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({
+        title: t('auth.loginFailed'),
+        description: error instanceof Error ? error.message : t('auth.unknownError'),
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -105,7 +127,9 @@ const Login = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">{t('auth.loginButton')}</Button>
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? t('common.loading') : t('auth.loginButton')}
+              </Button>
             </form>
           </Form>
         </CardContent>
@@ -120,4 +144,3 @@ const Login = () => {
 };
 
 export default Login;
-

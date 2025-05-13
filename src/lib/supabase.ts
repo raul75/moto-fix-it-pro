@@ -1,11 +1,11 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { Database } from '@/integrations/supabase/types';
+import { Database } from '@/types/database.types';
 
-// Utilizziamo il client Supabase dalla directory integrations
+// Use the supabase client from the integrations directory
 import { supabase as supabaseClient } from '@/integrations/supabase/client';
 
-// Esportiamo il client Supabase per mantenere la compatibilità con il codice esistente
-const supabase = supabaseClient;
+// We're extending the supabaseClient to explicitly type it with our custom Database type
+const supabase = supabaseClient as ReturnType<typeof createClient<Database>>;
 
 export default supabase;
