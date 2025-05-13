@@ -1,8 +1,14 @@
 
-import { Database as SupabaseGeneratedDatabase } from '@/integrations/supabase/types';
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
 
-// Extend the Supabase generated type with our own table definitions
-export interface Database extends SupabaseGeneratedDatabase {
+// Define our Database type instead of extending the Supabase generated type
+export interface Database {
   public: {
     Tables: {
       customers: {
@@ -264,6 +270,9 @@ export interface Database extends SupabaseGeneratedDatabase {
       [_ in never]: never;
     };
     Enums: {
+      [_ in never]: never;
+    };
+    CompositeTypes: {
       [_ in never]: never;
     };
   };
