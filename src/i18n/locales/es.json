@@ -1,3 +1,4 @@
+
 {
   "app": {
     "title": "MotoFix",
@@ -80,7 +81,18 @@
     "noAccount": "¿No tienes una cuenta?",
     "registerHere": "Regístrate aquí",
     "loginSuccess": "Inicio de sesión exitoso",
+    "loginFailed": "Error al iniciar sesión",
     "loginError": "Error al iniciar sesión. Verifica tus credenciales.",
+    "invalidCredentials": "Credenciales inválidas",
+    "checkCredentials": "Verifica tus credenciales",
+    "unknownError": "Error desconocido",
+    "welcomeBack": "¡Bienvenido de vuelta!",
+    "demoLogin": "Acceso Demo",
+    "demoLoginSuccess": "Acceso demo exitoso",
+    "demoLoginFailed": "Error en acceso demo",
+    "welcomeToDemo": "¡Bienvenido a la demo!",
+    "contactAdmin": "Contacta al administrador",
+    "demoNote": "Usa el botón 'Acceso Demo' para probar la aplicación",
     "register": "Registrarse",
     "registerDesc": "Crea una nueva cuenta",
     "name": "Nombre",
@@ -148,5 +160,8 @@
     "readyToStartDesc": "Reserva una cita o regístrate para recibir recordatorios de mantenimiento regular",
     "contactUs": "Contáctanos Ahora",
     "register": "Registrarse como Cliente"
+  },
+  "common": {
+    "loading": "Cargando..."
   }
 }
