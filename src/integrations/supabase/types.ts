@@ -337,6 +337,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      is_current_user_customer: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       is_customer_owner: {
         Args: { customer_id: string }
         Returns: boolean

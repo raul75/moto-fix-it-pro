@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, UserRole } from '@/types';
@@ -33,32 +34,44 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log("Auth state changed:", event);
-        setUser(session?.user ? {
-          id: session.user.id,
-          email: session.user.email || '',
-          name: session.user.user_metadata.name || '',
-          role: (session.user.user_metadata.role as UserRole) || 'cliente',
-          createdAt: session.user.created_at || '',
-          customerId: session.user.user_metadata.role === 'cliente' ? session.user.id : undefined,
-          lastLogin: new Date().toISOString()
-        } : null);
-        setIsAuthenticated(!!session);
+        if (session?.user) {
+          const userData = session.user.user_metadata;
+          setUser({
+            id: session.user.id,
+            email: session.user.email || '',
+            name: userData.name || '',
+            role: (userData.role as UserRole) || 'cliente',
+            createdAt: session.user.created_at || '',
+            customerId: userData.role === 'cliente' ? session.user.id : undefined,
+            lastLogin: new Date().toISOString()
+          });
+          setIsAuthenticated(true);
+        } else {
+          setUser(null);
+          setIsAuthenticated(false);
+        }
         setIsLoading(false);
       }
     );
     
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ? {
-        id: session.user.id,
-        email: session.user.email || '',
-        name: session.user.user_metadata.name || '',
-        role: (session.user.user_metadata.role as UserRole) || 'cliente',
-        createdAt: session.user.created_at || '',
-        customerId: session.user.user_metadata.role === 'cliente' ? session.user.id : undefined,
-        lastLogin: new Date().toISOString()
-      } : null);
-      setIsAuthenticated(!!session);
+      if (session?.user) {
+        const userData = session.user.user_metadata;
+        setUser({
+          id: session.user.id,
+          email: session.user.email || '',
+          name: userData.name || '',
+          role: (userData.role as UserRole) || 'cliente',
+          createdAt: session.user.created_at || '',
+          customerId: userData.role === 'cliente' ? session.user.id : undefined,
+          lastLogin: new Date().toISOString()
+        });
+        setIsAuthenticated(true);
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
       setIsLoading(false);
     });
 

@@ -1,232 +1,165 @@
 
 import React from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Wrench, Users, Package, Receipt, Camera, Settings as SettingsIcon, LogOut } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import LanguageSelector from './LanguageSelector';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Avatar, AvatarFallback } from './ui/avatar';
-import {
-  SidebarProvider,
-  Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarFooter,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarRail,
-  SidebarTrigger
-} from './ui/sidebar';
+import LanguageSelector from '@/components/LanguageSelector';
+import { 
+  Home, 
+  Users, 
+  Package, 
+  FileText, 
+  Camera, 
+  Settings, 
+  LogOut,
+  Wrench,
+  MotorcycleIcon as Bike
+} from 'lucide-react';
 
-type LayoutProps = {
+interface LayoutProps {
   children: React.ReactNode;
-};
+}
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
   const { user, logout, hasRole } = useAuth();
-  const navigate = useNavigate();
-  
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
   const isActive = (path: string) => {
-    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+    return location.pathname === path;
   };
 
-  const getRoleBadgeColor = () => {
-    if (!user) return 'bg-secondary';
-    
-    switch (user.role) {
-      case 'admin':
-        return 'bg-red-500 text-white';
-      case 'tecnico':
-        return 'bg-blue-500 text-white';
-      case 'cliente':
-        return 'bg-green-500 text-white';
-      default:
-        return 'bg-secondary';
+  // Navigation items per admin e tecnici
+  const adminNavItems = [
+    { 
+      path: '/dashboard', 
+      label: t('app.nav.dashboard'), 
+      icon: Home 
+    },
+    { 
+      path: '/customers', 
+      label: t('app.nav.customers'), 
+      icon: Users,
+      roles: ['admin', 'tecnico']
+    },
+    { 
+      path: '/repairs', 
+      label: 'Riparazioni', 
+      icon: Wrench,
+      roles: ['admin', 'tecnico']
+    },
+    { 
+      path: '/inventory', 
+      label: t('app.nav.inventory'), 
+      icon: Package,
+      roles: ['admin', 'tecnico']
+    },
+    { 
+      path: '/invoices', 
+      label: t('app.nav.invoices'), 
+      icon: FileText,
+      roles: ['admin', 'tecnico']
+    },
+    { 
+      path: '/photos', 
+      label: t('app.nav.photos'), 
+      icon: Camera,
+      roles: ['admin', 'tecnico']
+    },
+    { 
+      path: '/settings', 
+      label: t('app.nav.settings'), 
+      icon: Settings,
+      roles: ['admin']
     }
-  };
+  ];
 
-  const getRoleLabel = () => {
-    if (!user) return '';
-    
-    switch (user.role) {
-      case 'admin':
-        return t('roles.admin');
-      case 'tecnico':
-        return t('roles.technician');
-      case 'cliente':
-        return t('roles.customer');
-      default:
-        return user.role;
+  // Navigation items per clienti
+  const customerNavItems = [
+    { 
+      path: '/dashboard', 
+      label: 'Dashboard', 
+      icon: Home 
+    },
+    { 
+      path: '/my-motorcycles', 
+      label: 'Le Mie Moto', 
+      icon: Bike 
+    },
+    { 
+      path: '/my-repairs', 
+      label: 'Le Mie Riparazioni', 
+      icon: Wrench 
+    },
+    { 
+      path: '/my-invoices', 
+      label: 'Le Mie Fatture', 
+      icon: FileText 
     }
-  };
+  ];
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+  const navItems = hasRole('cliente') ? customerNavItems : adminNavItems;
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full">
-        <Sidebar collapsible="icon">
-          <SidebarHeader className="p-4 border-b flex items-center">
-            <h1 className="text-lg font-bold truncate">{t('app.title')}</h1>
-          </SidebarHeader>
-          
-          <SidebarContent className="py-2">
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton 
-                  tooltip={t('app.nav.dashboard')}
-                  isActive={isActive('/dashboard')}
-                  asChild
-                >
-                  <NavLink to="/dashboard">
-                    <Wrench className="h-5 w-5" />
-                    <span>{t('app.nav.dashboard')}</span>
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              
-              {hasRole(['admin', 'tecnico']) && (
-                <>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton 
-                      tooltip={t('app.nav.customers')}
-                      isActive={isActive('/customers')}
-                      asChild
-                    >
-                      <NavLink to="/customers">
-                        <Users className="h-5 w-5" />
-                        <span>{t('app.nav.customers')}</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  
-                  <SidebarMenuItem>
-                    <SidebarMenuButton 
-                      tooltip={t('app.nav.repairs')}
-                      isActive={isActive('/repairs')}
-                      asChild
-                    >
-                      <NavLink to="/repairs">
-                        <Wrench className="h-5 w-5" />
-                        <span>Riparazioni</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  
-                  <SidebarMenuItem>
-                    <SidebarMenuButton 
-                      tooltip={t('app.nav.inventory')}
-                      isActive={isActive('/inventory')}
-                      asChild
-                    >
-                      <NavLink to="/inventory">
-                        <Package className="h-5 w-5" />
-                        <span>{t('app.nav.inventory')}</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  
-                  <SidebarMenuItem>
-                    <SidebarMenuButton 
-                      tooltip={t('app.nav.invoices')}
-                      isActive={isActive('/invoices')}
-                      asChild
-                    >
-                      <NavLink to="/invoices">
-                        <Receipt className="h-5 w-5" />
-                        <span>{t('app.nav.invoices')}</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                  
-                  <SidebarMenuItem>
-                    <SidebarMenuButton 
-                      tooltip={t('app.nav.photos')}
-                      isActive={isActive('/photos')}
-                      asChild
-                    >
-                      <NavLink to="/photos">
-                        <Camera className="h-5 w-5" />
-                        <span>{t('app.nav.photos')}</span>
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </>
-              )}
-              
-              {hasRole('admin') && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton 
-                    tooltip={t('app.nav.settings')}
-                    isActive={isActive('/settings')}
-                    asChild
-                  >
-                    <NavLink to="/settings">
-                      <SettingsIcon className="h-5 w-5" />
-                      <span>{t('app.nav.settings')}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
-            </SidebarMenu>
-          </SidebarContent>
-          
-          <SidebarFooter className="mt-auto border-t p-4">
-            <div className="flex items-center justify-between">
-              <LanguageSelector />
-            </div>
-          </SidebarFooter>
-          
-          {/* The rail allows users to expand/collapse by clicking on the edge */}
-          <SidebarRail />
-        </Sidebar>
-
-        {/* Main content */}
-        <div className="flex-1 overflow-auto">
-          <header className="border-b bg-card p-4 sticky top-0 z-10 flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <SidebarTrigger className="mr-2" />
-              {/* Header content if needed */}
-            </div>
-            <div className="flex items-center gap-4">
-              
-              {user && (
-                <div className="flex items-center gap-4">
-                  <div className="hidden md:flex items-center gap-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback>
-                        {user.name.substring(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium">{user.name}</span>
-                      <Badge className={`${getRoleBadgeColor()} text-xs px-2 py-0`}>
-                        {getRoleLabel()}
-                      </Badge>
-                    </div>
-                  </div>
-                  
-                  <Button variant="ghost" size="icon" onClick={handleLogout} title={t('auth.logout')}>
-                    <LogOut className="h-5 w-5" />
-                  </Button>
-                </div>
-              )}
-            </div>
-          </header>
-          <main className="p-6">
-            {children}
-          </main>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="border-b bg-white shadow-sm">
+        <div className="flex h-16 items-center justify-between px-6">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-xl font-bold text-primary">MotoFix</h1>
+            {user && (
+              <span className="text-sm text-muted-foreground">
+                {user.name} ({hasRole('admin') ? 'Admin' : hasRole('tecnico') ? 'Tecnico' : 'Cliente'})
+              </span>
+            )}
+          </div>
+          <div className="flex items-center space-x-4">
+            <LanguageSelector />
+            <Button variant="outline" size="sm" onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              {t('auth.logout')}
+            </Button>
+          </div>
         </div>
+      </header>
+
+      <div className="flex">
+        {/* Sidebar */}
+        <aside className="w-64 border-r bg-muted/30 min-h-[calc(100vh-4rem)]">
+          <nav className="p-4 space-y-2">
+            {navItems.map((item) => {
+              // Check if user has required role for this nav item
+              if (item.roles && !hasRole(item.roles)) {
+                return null;
+              }
+
+              return (
+                <Button
+                  key={item.path}
+                  variant={isActive(item.path) ? 'default' : 'ghost'}
+                  className="w-full justify-start"
+                  onClick={() => navigate(item.path)}
+                >
+                  <item.icon className="mr-2 h-4 w-4" />
+                  {item.label}
+                </Button>
+              );
+            })}
+          </nav>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 p-6">
+          {children}
+        </main>
       </div>
-    </SidebarProvider>
+    </div>
   );
 };
 
