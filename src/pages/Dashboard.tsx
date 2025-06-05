@@ -7,6 +7,7 @@ import StatsCard from '@/components/StatsCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
+import { UserRole } from '@/types';
 import { 
   Users, 
   Wrench, 
@@ -44,19 +45,19 @@ const Dashboard = () => {
               title="Le Mie Motociclette"
               value="0"
               description="Motociclette registrate"
-              icon={Bike}
+              icon={<Bike className="h-4 w-4" />}
             />
             <StatsCard
               title="Riparazioni Attive"
               value="0"
               description="In lavorazione"
-              icon={Wrench}
+              icon={<Wrench className="h-4 w-4" />}
             />
             <StatsCard
               title="Fatture in Sospeso"
               value="€0"
               description="Da pagare"
-              icon={DollarSign}
+              icon={<DollarSign className="h-4 w-4" />}
             />
           </div>
           
@@ -101,7 +102,7 @@ const Dashboard = () => {
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">{t('app.nav.dashboard')}</h1>
           <div className="flex gap-2">
-            {hasRole(['admin', 'tecnico']) && (
+            {hasRole(['admin', 'tecnico'] as UserRole[]) && (
               <Button onClick={() => navigate('/repairs/new')} className="flex gap-2">
                 <Plus className="h-4 w-4" />
                 Nuova Riparazione
@@ -115,25 +116,25 @@ const Dashboard = () => {
             title="Clienti Totali"
             value="0"
             description="Clienti registrati"
-            icon={Users}
+            icon={<Users className="h-4 w-4" />}
           />
           <StatsCard
             title="Riparazioni Attive"
             value="0"
             description="In lavorazione"
-            icon={Wrench}
+            icon={<Wrench className="h-4 w-4" />}
           />
           <StatsCard
             title="Parti in Inventario"
             value="0"
             description="Pezzi disponibili"
-            icon={Package}
+            icon={<Package className="h-4 w-4" />}
           />
           <StatsCard
             title="Fatture del Mese"
             value="€0"
             description="Entrate mensili"
-            icon={FileText}
+            icon={<FileText className="h-4 w-4" />}
           />
         </div>
         

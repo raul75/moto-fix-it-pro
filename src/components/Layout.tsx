@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import LanguageSelector from '@/components/LanguageSelector';
+import { UserRole } from '@/types';
 import { 
   Home, 
   Users, 
@@ -25,7 +26,7 @@ interface NavItem {
   path: string;
   label: string;
   icon: any;
-  roles?: string[];
+  roles?: UserRole[];
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
