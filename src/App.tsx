@@ -22,6 +22,9 @@ import Index from "./pages/Index";
 import Workshop from "./pages/Workshop";
 import RepairsPage from "./pages/Repairs";
 import NewRepairPage from "./pages/NewRepair";
+import MyMotorcycles from "./pages/MyMotorcycles";
+import MyRepairs from "./pages/MyRepairs";
+import MyInvoices from "./pages/MyInvoices";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +48,23 @@ const App = () => (
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            } />
+            
+            {/* Pagine per clienti */}
+            <Route path="/my-motorcycles" element={
+              <ProtectedRoute roles="cliente">
+                <MyMotorcycles />
+              </ProtectedRoute>
+            } />
+            <Route path="/my-repairs" element={
+              <ProtectedRoute roles="cliente">
+                <MyRepairs />
+              </ProtectedRoute>
+            } />
+            <Route path="/my-invoices" element={
+              <ProtectedRoute roles="cliente">
+                <MyInvoices />
               </ProtectedRoute>
             } />
             
@@ -74,7 +94,6 @@ const App = () => (
                 <PhotosPage />
               </ProtectedRoute>
             } />
-            {/* Add repairs routes */}
             <Route path="/repairs" element={
               <ProtectedRoute roles={['admin', 'tecnico']}>
                 <RepairsPage />
