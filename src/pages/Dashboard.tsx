@@ -15,7 +15,7 @@ import {
   Camera,
   Settings,
   Plus,
-  MotorcycleIcon as Bike,
+  Bike,
   DollarSign,
   Clock,
   CheckCircle

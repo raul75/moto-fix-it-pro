@@ -14,11 +14,18 @@ import {
   Settings, 
   LogOut,
   Wrench,
-  MotorcycleIcon as Bike
+  Bike
 } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
+}
+
+interface NavItem {
+  path: string;
+  label: string;
+  icon: any;
+  roles?: string[];
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
@@ -36,7 +43,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   // Navigation items per admin e tecnici
-  const adminNavItems = [
+  const adminNavItems: NavItem[] = [
     { 
       path: '/dashboard', 
       label: t('app.nav.dashboard'), 
@@ -81,7 +88,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   ];
 
   // Navigation items per clienti
-  const customerNavItems = [
+  const customerNavItems: NavItem[] = [
     { 
       path: '/dashboard', 
       label: 'Dashboard', 
