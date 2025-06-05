@@ -1,167 +1,36 @@
 
 {
-  "app": {
-    "title": "MotoFix",
-    "description": "Sistema di gestione per officine di motociclette",
-    "nav": {
-      "dashboard": "Dashboard",
-      "customers": "Clienti",
-      "inventory": "Inventario",
-      "invoices": "Fatture",
-      "photos": "Foto",
-      "settings": "Impostazioni",
-      "home": "Home",
-      "workshop": "La Nostra Officina"
-    }
-  },
-  "settings": {
-    "title": "Impostazioni",
-    "tabs": {
-      "general": "Generale",
-      "business": "Azienda",
-      "invoices": "Fatture",
-      "users": "Utenti"
-    },
-    "general": {
-      "title": "Impostazioni Generali",
-      "description": "Gestisci le impostazioni generali del sistema",
-      "darkMode": "Modalità Scura",
-      "darkModeDesc": "Passa dalla modalità chiara a quella scura",
-      "notifications": "Notifiche",
-      "notificationsDesc": "Ricevi notifiche dal sistema",
-      "lowStockAlerts": "Avvisi di Scorte Basse",
-      "lowStockAlertsDesc": "Ricevi avvisi quando le scorte sono basse"
-    },
-    "backup": {
-      "title": "Backup",
-      "description": "Gestisci i backup dei tuoi dati",
-      "autoBackup": "Backup Automatico",
-      "autoBackupDesc": "Crea backup automaticamente",
-      "manualBackup": "Crea Backup"
-    },
-    "business": {
-      "title": "Informazioni Aziendali",
-      "description": "Gestisci le informazioni della tua officina",
-      "companyName": "Nome Azienda",
-      "vat": "P.IVA/Codice Fiscale",
-      "address": "Indirizzo",
-      "city": "Città",
-      "zip": "CAP",
-      "province": "Provincia",
-      "phone": "Telefono",
-      "email": "Email",
-      "save": "Salva"
-    },
-    "invoices": {
-      "title": "Impostazioni Fatture",
-      "description": "Personalizza le tue fatture",
-      "invoicePrefix": "Prefisso Fattura",
-      "nextNumber": "Prossimo Numero",
-      "paymentTerms": "Termini di Pagamento (giorni)",
-      "taxRate": "Aliquota IVA (%)",
-      "invoiceNotes": "Note Fattura",
-      "save": "Salva"
-    },
-    "users": {
-      "title": "Gestione Utenti",
-      "description": "Gestisci gli utenti del sistema",
-      "admin": "Amministratore",
-      "technician": "Tecnico",
-      "customer": "Cliente",
-      "addUser": "Aggiungi Utente"
-    }
-  },
-  "auth": {
-    "login": "Accedi",
-    "loginDesc": "Accedi per utilizzare il sistema",
-    "email": "Email",
-    "password": "Password",
-    "loginButton": "Accedi",
-    "logoutSuccess": "Hai effettuato il logout con successo",
-    "noAccount": "Non hai un account?",
-    "registerHere": "Registrati qui",
-    "loginSuccess": "Accesso effettuato con successo",
-    "loginFailed": "Errore di accesso",
-    "loginError": "Errore di accesso. Verifica le tue credenziali.",
-    "invalidCredentials": "Credenziali non valide",
-    "checkCredentials": "Verifica le tue credenziali",
-    "unknownError": "Errore sconosciuto",
-    "welcomeBack": "Bentornato!",
-    "demoLogin": "Accesso Demo",
-    "demoLoginSuccess": "Accesso demo effettuato",
-    "demoLoginFailed": "Accesso demo fallito",
-    "welcomeToDemo": "Benvenuto nella demo!",
-    "contactAdmin": "Contatta l'amministratore",
-    "demoNote": "Usa il pulsante 'Accesso Demo' per provare l'applicazione",
-    "register": "Registrati",
-    "registerDesc": "Crea un nuovo account",
-    "name": "Nome",
-    "namePlaceholder": "Nome completo",
-    "confirmPassword": "Conferma Password",
-    "registerButton": "Registrati",
-    "haveAccount": "Hai già un account?",
-    "loginHere": "Accedi qui",
-    "registerSuccess": "Registrazione completata. Ora puoi accedere.",
-    "registerError": "Errore durante la registrazione. Riprova.",
-    "emailInUse": "Questa email è già in uso.",
-    "logout": "Logout"
-  },
-  "validation": {
-    "emailInvalid": "Email non valida",
-    "passwordMin": "La password deve essere di almeno {count} caratteri",
-    "passwordsMatch": "Le password non corrispondono",
-    "nameMin": "Il nome deve essere di almeno {count} caratteri",
-    "required": "Questo campo è obbligatorio"
-  },
-  "roles": {
-    "admin": "Amministratore",
-    "technician": "Tecnico",
-    "customer": "Cliente"
-  },
   "nav": {
-    "home": "Home",
-    "back": "Indietro"
+    "dashboard": "Dashboard",
+    "customers": "Clienti",
+    "inventory": "Inventario",
+    "invoices": "Fatture",
+    "photos": "Foto",
+    "settings": "Impostazioni",
+    "repairs": "Riparazioni",
+    "logout": "Esci",
+    "my_motorcycles": "Le Mie Moto",
+    "my_repairs": "Le Mie Riparazioni",
+    "my_invoices": "Le Mie Fatture"
   },
-  "error": {
-    "accessDenied": "Accesso Negato",
-    "noPermission": "Non hai il permesso di accedere a questa pagina",
-    "pageNotFound": "Pagina Non Trovata",
-    "pageNotFoundDesc": "La pagina che stai cercando non esiste."
-  },
-  "workshop": {
-    "title": "Officina Professionale di Riparazione Motociclette",
-    "subtitle": "Servizio esperto e manutenzione per tutte le marche e i modelli di motociclette",
-    "services": "I Nostri Servizi",
-    "servicesDescription": "Offriamo un'ampia gamma di servizi professionali di riparazione e manutenzione per motociclette",
-    "contact": "Contattaci",
-    "serviceRepair": "Riparazioni e Diagnostica",
-    "serviceRepairDesc": "Diagnostica professionale e riparazioni per tutti i problemi meccanici ed elettrici",
-    "serviceMaintenance": "Manutenzione Regolare",
-    "serviceMaintenanceDesc": "Manutenzione programmata e messe a punto per mantenere la tua moto in condizioni ottimali",
-    "serviceCustomization": "Modifiche Personalizzate",
-    "serviceCustomizationDesc": "Modifiche e aggiornamenti personalizzati per migliorare prestazioni e stile",
-    "whyChoose": "Perché Sceglierci",
-    "whyChooseDescription": "Con anni di esperienza e dedizione alla qualità, siamo il partner di fiducia per la cura della tua motocicletta",
-    "certified": "Tecnici Certificati",
-    "certifiedDesc": "Il nostro team è composto da specialisti di motociclette formati e certificati",
-    "quickService": "Tempi Rapidi",
-    "quickServiceDesc": "Valorizziamo il tuo tempo e ci impegniamo a completare le riparazioni rapidamente senza sacrificare la qualità",
-    "qualityParts": "Ricambi di Qualità",
-    "qualityPartsDesc": "Utilizziamo solo ricambi originali o aftermarket di alta qualità per tutte le riparazioni",
-    "modernEquipment": "Attrezzatura Moderna",
-    "modernEquipmentDesc": "La nostra officina è dotata degli strumenti diagnostici e di riparazione più recenti",
-    "support": "Assistenza Clienti",
-    "supportDesc": "Forniamo supporto e consigli continui per la manutenzione della tua motocicletta",
-    "warranty": "Garanzia di Servizio",
-    "warrantyDesc": "Tutto il nostro lavoro di riparazione viene fornito con una garanzia di soddisfazione",
-    "gallery": "Galleria dell'Officina",
-    "galleryDescription": "Fai un tour della nostra struttura e attrezzatura moderna",
-    "readyToStart": "Pronto a Sperimentare un Servizio Professionale?",
-    "readyToStartDesc": "Prenota un appuntamento o registrati per ricevere promemoria di manutenzione regolare",
-    "contactUs": "Contattaci Ora",
-    "register": "Registrati come Cliente"
+  "repairs": {
+    "title": "Riparazioni",
+    "new_repair": "Nuova Riparazione",
+    "pending": "In Attesa",
+    "in_progress": "In Lavorazione",
+    "completed": "Completate",
+    "search_placeholder": "Cerca riparazioni...",
+    "no_repairs_found": "Nessuna riparazione trovata con questi criteri di ricerca.",
+    "no_repairs_in_category": "Nessuna riparazione presente in questa categoria."
   },
   "common": {
-    "loading": "Caricamento..."
+    "search": "Cerca",
+    "add": "Aggiungi",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "loading": "Caricamento...",
+    "no_data": "Nessun dato disponibile"
   }
 }
