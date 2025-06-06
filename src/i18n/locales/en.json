@@ -11,8 +11,19 @@
       "photos": "Photos",
       "settings": "Settings",
       "home": "Home",
-      "workshop": "Our Workshop"
+      "workshop": "Our Workshop",
+      "repairs": "Repairs"
     }
+  },
+  "repairs": {
+    "title": "Repairs",
+    "new_repair": "New Repair",
+    "pending": "Pending",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "search_placeholder": "Search repairs...",
+    "no_repairs_found": "No repairs found with these search criteria.",
+    "no_repairs_in_category": "No repairs in this category."
   },
   "settings": {
     "title": "Settings",
@@ -68,7 +79,12 @@
       "admin": "Administrator",
       "technician": "Technician",
       "customer": "Customer",
-      "addUser": "Add User"
+      "addUser": "Add User",
+      "editUser": "Edit User",
+      "deleteUser": "Delete User",
+      "userAdded": "User added successfully",
+      "userUpdated": "User updated successfully",
+      "userDeleted": "User deleted successfully"
     }
   },
   "auth": {

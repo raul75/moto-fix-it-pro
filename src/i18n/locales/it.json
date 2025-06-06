@@ -28,6 +28,68 @@
       "settings": "Impostazioni"
     }
   },
+  "settings": {
+    "title": "Impostazioni",
+    "tabs": {
+      "general": "Generale",
+      "business": "Attività",
+      "invoices": "Fatture",
+      "users": "Utenti"
+    },
+    "general": {
+      "title": "Impostazioni Generali",
+      "description": "Gestisci le impostazioni generali del sistema",
+      "darkMode": "Modalità Scura",
+      "darkModeDesc": "Passa tra modalità chiara e scura",
+      "notifications": "Notifiche",
+      "notificationsDesc": "Ricevi notifiche di sistema",
+      "lowStockAlerts": "Avvisi Scorte Basse",
+      "lowStockAlertsDesc": "Ricevi avvisi quando le scorte sono basse"
+    },
+    "backup": {
+      "title": "Backup",
+      "description": "Gestisci i backup dei tuoi dati",
+      "autoBackup": "Backup Automatico",
+      "autoBackupDesc": "Crea backup automaticamente",
+      "manualBackup": "Crea Backup"
+    },
+    "business": {
+      "title": "Informazioni Attività",
+      "description": "Gestisci le informazioni della tua officina",
+      "companyName": "Nome Azienda",
+      "vat": "Partita IVA",
+      "address": "Indirizzo",
+      "city": "Città",
+      "zip": "CAP",
+      "province": "Provincia",
+      "phone": "Telefono",
+      "email": "Email",
+      "save": "Salva"
+    },
+    "invoices": {
+      "title": "Impostazioni Fatture",
+      "description": "Personalizza le tue fatture",
+      "invoicePrefix": "Prefisso Fattura",
+      "nextNumber": "Prossimo Numero",
+      "paymentTerms": "Termini di Pagamento (giorni)",
+      "taxRate": "Aliquota IVA (%)",
+      "invoiceNotes": "Note Fattura",
+      "save": "Salva"
+    },
+    "users": {
+      "title": "Gestione Utenti",
+      "description": "Gestisci gli utenti del sistema",
+      "admin": "Amministratore",
+      "technician": "Tecnico",
+      "customer": "Cliente",
+      "addUser": "Aggiungi Utente",
+      "editUser": "Modifica Utente",
+      "deleteUser": "Elimina Utente",
+      "userAdded": "Utente aggiunto con successo",
+      "userUpdated": "Utente aggiornato con successo",
+      "userDeleted": "Utente eliminato con successo"
+    }
+  },
   "auth": {
     "login": "Accedi",
     "register": "Registrati",

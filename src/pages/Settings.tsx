@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -10,9 +10,84 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { Edit, Trash2, Plus } from 'lucide-react';
 
 const SettingsPage = () => {
   const { t } = useTranslation();
+  const { toast } = useToast();
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isEditUserOpen, setIsEditUserOpen] = useState(false);
+  const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [newUser, setNewUser] = useState({ name: '', email: '', role: '' });
+
+  // Mock users data - in real app this would come from API
+  const [users, setUsers] = useState([
+    { id: 1, name: 'Admin', email: 'admin@motofix.it', role: 'admin' },
+    { id: 2, name: 'Tecnico', email: 'tecnico@motofix.it', role: 'technician' },
+    { id: 3, name: 'Cliente Test', email: 'cliente@example.com', role: 'customer' }
+  ]);
+
+  const handleDarkModeToggle = (checked: boolean) => {
+    setIsDarkMode(checked);
+    // Toggle dark mode class on document root
+    if (checked) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    
+    toast({
+      title: t('common.success'),
+      description: checked ? 'Modalità scura attivata' : 'Modalità chiara attivata',
+    });
+  };
+
+  const handleEditUser = (user: any) => {
+    setSelectedUser(user);
+    setIsEditUserOpen(true);
+  };
+
+  const handleDeleteUser = (userId: number) => {
+    setUsers(users.filter(user => user.id !== userId));
+    toast({
+      title: t('common.success'),
+      description: t('settings.users.userDeleted'),
+    });
+  };
+
+  const handleSaveUser = () => {
+    if (selectedUser) {
+      setUsers(users.map(user => 
+        user.id === selectedUser.id ? selectedUser : user
+      ));
+      toast({
+        title: t('common.success'),
+        description: t('settings.users.userUpdated'),
+      });
+    }
+    setIsEditUserOpen(false);
+    setSelectedUser(null);
+  };
+
+  const handleAddUser = () => {
+    if (newUser.name && newUser.email && newUser.role) {
+      const user = {
+        id: Math.max(...users.map(u => u.id)) + 1,
+        ...newUser
+      };
+      setUsers([...users, user]);
+      setNewUser({ name: '', email: '', role: '' });
+      setIsAddUserOpen(false);
+      toast({
+        title: t('common.success'),
+        description: t('settings.users.userAdded'),
+      });
+    }
+  };
   
   return (
     <Layout>
@@ -40,7 +115,11 @@ const SettingsPage = () => {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="dark-mode">{t('settings.general.darkMode')}</Label>
-                  <Switch id="dark-mode" />
+                  <Switch 
+                    id="dark-mode" 
+                    checked={isDarkMode}
+                    onCheckedChange={handleDarkModeToggle}
+                  />
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {t('settings.general.darkModeDesc')}
@@ -211,23 +290,147 @@ const SettingsPage = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">Admin</p>
-                    <p className="text-sm text-muted-foreground">admin@motofix.it</p>
+                {users.map((user) => (
+                  <div key={user.id} className="flex justify-between items-center p-4 border rounded-lg">
+                    <div>
+                      <p className="font-medium">{user.name}</p>
+                      <p className="text-sm text-muted-foreground">{user.email}</p>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Badge variant="outline">
+                        {t(`settings.users.${user.role}`)}
+                      </Badge>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEditUser(user)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDeleteUser(user.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
-                  <Badge variant="outline">{t('settings.users.admin')}</Badge>
-                </div>
+                ))}
                 
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="font-medium">Tecnico</p>
-                    <p className="text-sm text-muted-foreground">tecnico@motofix.it</p>
-                  </div>
-                  <Badge variant="outline">{t('settings.users.technician')}</Badge>
-                </div>
-                
-                <Button>{t('settings.users.addUser')}</Button>
+                <Dialog open={isAddUserOpen} onOpenChange={setIsAddUserOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="w-full">
+                      <Plus className="mr-2 h-4 w-4" />
+                      {t('settings.users.addUser')}
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>{t('settings.users.addUser')}</DialogTitle>
+                      <DialogDescription>
+                        Aggiungi un nuovo utente al sistema
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="new-user-name">{t('auth.name')}</Label>
+                        <Input
+                          id="new-user-name"
+                          value={newUser.name}
+                          onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="new-user-email">{t('auth.email')}</Label>
+                        <Input
+                          id="new-user-email"
+                          type="email"
+                          value={newUser.email}
+                          onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="new-user-role">{t('auth.role')}</Label>
+                        <Select onValueChange={(value) => setNewUser({...newUser, role: value})}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleziona ruolo" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="admin">{t('settings.users.admin')}</SelectItem>
+                            <SelectItem value="technician">{t('settings.users.technician')}</SelectItem>
+                            <SelectItem value="customer">{t('settings.users.customer')}</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setIsAddUserOpen(false)}>
+                        {t('common.cancel')}
+                      </Button>
+                      <Button onClick={handleAddUser}>
+                        {t('common.add')}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+
+                {/* Edit User Dialog */}
+                <Dialog open={isEditUserOpen} onOpenChange={setIsEditUserOpen}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>{t('settings.users.editUser')}</DialogTitle>
+                      <DialogDescription>
+                        Modifica le informazioni dell'utente
+                      </DialogDescription>
+                    </DialogHeader>
+                    {selectedUser && (
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="edit-user-name">{t('auth.name')}</Label>
+                          <Input
+                            id="edit-user-name"
+                            value={selectedUser.name}
+                            onChange={(e) => setSelectedUser({...selectedUser, name: e.target.value})}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="edit-user-email">{t('auth.email')}</Label>
+                          <Input
+                            id="edit-user-email"
+                            type="email"
+                            value={selectedUser.email}
+                            onChange={(e) => setSelectedUser({...selectedUser, email: e.target.value})}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="edit-user-role">{t('auth.role')}</Label>
+                          <Select 
+                            value={selectedUser.role} 
+                            onValueChange={(value) => setSelectedUser({...selectedUser, role: value})}
+                          >
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="admin">{t('settings.users.admin')}</SelectItem>
+                              <SelectItem value="technician">{t('settings.users.technician')}</SelectItem>
+                              <SelectItem value="customer">{t('settings.users.customer')}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    )}
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setIsEditUserOpen(false)}>
+                        {t('common.cancel')}
+                      </Button>
+                      <Button onClick={handleSaveUser}>
+                        {t('common.save')}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             </CardContent>
           </Card>
