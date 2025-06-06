@@ -1,12 +1,10 @@
-
 import React, { useState } from 'react';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Search, AlertTriangle } from 'lucide-react';
-import { inventoryParts } from '@/data/mockData';
+import { Plus, Search, AlertTriangle, Edit, Trash2 } from 'lucide-react';
 import { 
   Dialog, 
   DialogContent, 
@@ -18,11 +16,17 @@ import {
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { InventoryPart } from '@/types';
+import EditInventoryPartDialog from '@/components/dialogs/EditInventoryPartDialog';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getInventoryParts, createInventoryPart, updateInventoryPart, deleteInventoryPart } from '@/api/inventory';
 
 const InventoryPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedPart, setSelectedPart] = useState<InventoryPart | null>(null);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // New part form state
   const [newPart, setNewPart] = useState<Partial<InventoryPart>>({
@@ -34,6 +38,84 @@ const InventoryPage = () => {
     minimumQuantity: 0,
     location: '',
     supplier: ''
+  });
+
+  // Fetch inventory parts with React Query
+  const { data: inventoryParts = [], isLoading } = useQuery({
+    queryKey: ['inventory-parts'],
+    queryFn: getInventoryParts,
+    initialData: []
+  });
+
+  // Create part mutation
+  const createPartMutation = useMutation({
+    mutationFn: createInventoryPart,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['inventory-parts'] });
+      toast({
+        title: "Ricambio aggiunto",
+        description: `${newPart.name} è stato aggiunto al magazzino.`,
+      });
+      setDialogOpen(false);
+      setNewPart({
+        name: '',
+        partNumber: '',
+        price: 0,
+        cost: 0,
+        quantity: 0,
+        minimumQuantity: 0,
+        location: '',
+        supplier: ''
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Errore",
+        description: error instanceof Error ? error.message : "Errore durante l'aggiunta del ricambio",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Update part mutation
+  const updatePartMutation = useMutation({
+    mutationFn: ({ id, updates }: { id: string; updates: Partial<InventoryPart> }) => 
+      updateInventoryPart(id, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['inventory-parts'] });
+      toast({
+        title: "Ricambio aggiornato",
+        description: "Le modifiche sono state salvate con successo.",
+      });
+      setEditDialogOpen(false);
+      setSelectedPart(null);
+    },
+    onError: (error) => {
+      toast({
+        title: "Errore",
+        description: error instanceof Error ? error.message : "Errore durante l'aggiornamento del ricambio",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Delete part mutation
+  const deletePartMutation = useMutation({
+    mutationFn: deleteInventoryPart,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['inventory-parts'] });
+      toast({
+        title: "Ricambio eliminato",
+        description: "Il ricambio è stato eliminato dal magazzino.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Errore",
+        description: error instanceof Error ? error.message : "Errore durante l'eliminazione del ricambio",
+        variant: "destructive"
+      });
+    }
   });
 
   // Handle form input changes
@@ -51,28 +133,27 @@ const InventoryPage = () => {
   // Handle form submission
   const handleSubmitNewPart = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Here you would normally add the part to the database
-    // For this mock, we'll just show a success toast
-    
-    toast({
-      title: "Ricambio aggiunto",
-      description: `${newPart.name} è stato aggiunto al magazzino.`,
-    });
-    
-    setDialogOpen(false);
-    
-    // Reset form
-    setNewPart({
-      name: '',
-      partNumber: '',
-      price: 0,
-      cost: 0,
-      quantity: 0,
-      minimumQuantity: 0,
-      location: '',
-      supplier: ''
-    });
+    createPartMutation.mutate(newPart as Omit<InventoryPart, 'id'>);
+  };
+
+  // Handle edit part
+  const handleEditPart = (part: InventoryPart) => {
+    setSelectedPart(part);
+    setEditDialogOpen(true);
+  };
+
+  // Handle save edited part
+  const handleSaveEditedPart = (updates: Partial<InventoryPart>) => {
+    if (selectedPart) {
+      updatePartMutation.mutate({ id: selectedPart.id, updates });
+    }
+  };
+
+  // Handle delete part
+  const handleDeletePart = (part: InventoryPart) => {
+    if (confirm(`Sei sicuro di voler eliminare "${part.name}"?`)) {
+      deletePartMutation.mutate(part.id);
+    }
   };
 
   // Filter parts based on search term
@@ -85,7 +166,7 @@ const InventoryPage = () => {
   });
 
   // Check if part is low stock
-  const isLowStock = (part: typeof inventoryParts[0]) => {
+  const isLowStock = (part: InventoryPart) => {
     return part.quantity <= (part.minimumQuantity || 0);
   };
 
@@ -161,10 +242,17 @@ const InventoryPage = () => {
               <TableHead className="text-right">Quantità</TableHead>
               <TableHead>Posizione</TableHead>
               <TableHead>Fornitore</TableHead>
+              <TableHead className="text-right">Azioni</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredParts.map(part => (
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-8">
+                  <p className="text-muted-foreground">Caricamento...</p>
+                </TableCell>
+              </TableRow>
+            ) : filteredParts.map(part => (
               <TableRow key={part.id}>
                 <TableCell>
                   <div className="flex items-center gap-2">
@@ -189,12 +277,32 @@ const InventoryPage = () => {
                 </TableCell>
                 <TableCell>{part.location || "—"}</TableCell>
                 <TableCell>{part.supplier || "—"}</TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleEditPart(part)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDeletePart(part)}
+                      className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
               </TableRow>
             ))}
             
-            {filteredParts.length === 0 && (
+            {!isLoading && filteredParts.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8">
+                <TableCell colSpan={8} className="text-center py-8">
                   <p className="text-muted-foreground">Nessun ricambio trovato.</p>
                 </TableCell>
               </TableRow>
@@ -331,11 +439,22 @@ const InventoryPage = () => {
             
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Annulla</Button>
-              <Button type="submit">Salva Ricambio</Button>
+              <Button type="submit" disabled={createPartMutation.isPending}>
+                {createPartMutation.isPending ? 'Salvando...' : 'Salva Ricambio'}
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Part Dialog */}
+      <EditInventoryPartDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        part={selectedPart}
+        onSave={handleSaveEditedPart}
+        isLoading={updatePartMutation.isPending}
+      />
     </Layout>
   );
 };

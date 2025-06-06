@@ -1,6 +1,6 @@
-
 import supabase from '@/lib/supabase';
 import { Repair, RepairStatus, Photo, UsedPart } from '@/types';
+import { consumeInventoryPart } from '@/api/inventory';
 
 // Convert Supabase repair to our app's Repair type
 const mapRepair = (dbRepair: any): Repair => ({
@@ -227,8 +227,9 @@ export async function uploadPhotoToRepair(repairId: string, file: File, caption?
   return await addPhotoToRepair(repairId, urlData.publicUrl, caption);
 }
 
-// Add a part to a repair
+// Add a part to a repair - UPDATED to integrate with inventory
 export async function addPartToRepair(repairId: string, partId: string, partName: string, quantity: number, priceEach: number): Promise<UsedPart> {
+  // First, add the part to the repair
   const { data, error } = await supabase
     .from('used_parts')
     .insert([{
@@ -243,6 +244,16 @@ export async function addPartToRepair(repairId: string, partId: string, partName
   
   if (error) {
     throw new Error(error.message);
+  }
+  
+  // Then, update the inventory by consuming the part quantity
+  try {
+    await consumeInventoryPart(partId, quantity);
+    console.log(`Inventory updated: consumed ${quantity} units of part ${partId}`);
+  } catch (inventoryError) {
+    console.error('Error updating inventory:', inventoryError);
+    // Note: We don't throw here to avoid rolling back the used_parts insertion
+    // The part is still added to the repair, but inventory might not be updated
   }
   
   return {
