@@ -68,26 +68,26 @@ const Dashboard = () => {
               <StatsCard
                 title={t('dashboard.totalRepairs')}
                 value={totalRepairs}
-                icon={Wrench}
-                trend={{ value: 12, isPositive: true }}
+                icon={<Wrench className="h-6 w-6" />}
+                trend={{ value: 12, positive: true }}
               />
               <StatsCard
                 title={t('dashboard.pendingRepairs')}
                 value={pendingRepairs}
-                icon={Wrench}
-                trend={{ value: 5, isPositive: false }}
+                icon={<Wrench className="h-6 w-6" />}
+                trend={{ value: 5, positive: false }}
               />
               <StatsCard
                 title={t('dashboard.completedRepairs')}
                 value={completedRepairs}
-                icon={Wrench}
-                trend={{ value: 8, isPositive: true }}
+                icon={<Wrench className="h-6 w-6" />}
+                trend={{ value: 8, positive: true }}
               />
               <StatsCard
                 title={t('dashboard.totalCustomers')}
                 value={totalCustomers}
-                icon={Users}
-                trend={{ value: 3, isPositive: true }}
+                icon={<Users className="h-6 w-6" />}
+                trend={{ value: 3, positive: true }}
               />
             </div>
 

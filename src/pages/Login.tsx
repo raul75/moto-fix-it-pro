@@ -35,19 +35,20 @@ const Login = () => {
     setError('');
 
     try {
-      const { error } = await login(email, password);
+      const success = await login(email, password);
       
-      if (error) {
-        setError(error.message);
+      if (!success) {
+        const errorMessage = 'Credenziali non valide';
+        setError(errorMessage);
         toast({
           title: t('common.error'),
-          description: error.message,
+          description: errorMessage,
           variant: "destructive"
         });
       } else {
         toast({
           title: t('common.success'),
-          description: "Accesso effettuato con successo",
+          description: t('auth.loginSuccess'),
         });
         navigate('/dashboard');
       }

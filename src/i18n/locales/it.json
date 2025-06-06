@@ -48,7 +48,9 @@
     "signUpHere": "Registrati qui",
     "signing": "Accesso in corso...",
     "registering": "Registrazione in corso...",
-    "selectRole": "Seleziona il tuo ruolo"
+    "selectRole": "Seleziona il tuo ruolo",
+    "loginSuccess": "Accesso effettuato con successo",
+    "registerSuccess": "Registrazione effettuata con successo"
   },
   "dashboard": {
     "title": "Dashboard",

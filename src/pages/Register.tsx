@@ -17,7 +17,7 @@ import { UserRole } from '@/types';
 const Register = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { signUp, isAuthenticated } = useAuth();
+  const { register, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -52,19 +52,20 @@ const Register = () => {
     }
 
     try {
-      const { error } = await signUp(email, password, name, role);
+      const success = await register(email, password, name, role);
       
-      if (error) {
-        setError(error.message);
+      if (!success) {
+        const errorMessage = 'Errore durante la registrazione';
+        setError(errorMessage);
         toast({
           title: t('common.error'),
-          description: error.message,
+          description: errorMessage,
           variant: "destructive"
         });
       } else {
         toast({
           title: t('common.success'),
-          description: "Registrazione effettuata con successo",
+          description: t('auth.registerSuccess'),
         });
         navigate('/dashboard');
       }
