@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -8,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Plus, Search, ChevronRight } from 'lucide-react';
 import { getCustomers, createCustomerInDb } from '@/api/customers';
-import { getMotorcyclesByCustomerId } from '@/api/motorcycles';
 import { 
   Dialog, 
   DialogContent, 
@@ -22,6 +22,7 @@ import { Label } from '@/components/ui/label';
 import { Customer } from '@/types';
 
 const CustomersPage = () => {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newCustomer, setNewCustomer] = useState<Partial<Customer>>({
@@ -45,15 +46,15 @@ const CustomersPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       toast({
-        title: "Cliente aggiunto",
-        description: `${newCustomer.name} è stato aggiunto con successo.`,
+        title: t('customers.customerAdded'),
+        description: t('customers.customerAddedSuccess', { name: newCustomer.name }),
       });
       setNewCustomer({ name: '', email: '', phone: '', address: '' });
       setIsDialogOpen(false);
     },
     onError: (error: any) => {
       toast({
-        title: "Errore",
+        title: t('common.error'),
         description: error.message || "Errore durante la creazione del cliente",
         variant: "destructive"
       });
@@ -79,8 +80,8 @@ const CustomersPage = () => {
     // Validate required fields
     if (!newCustomer.name || !newCustomer.email || !newCustomer.phone) {
       toast({
-        title: "Errore",
-        description: "I campi Nome, Email e Telefono sono obbligatori.",
+        title: t('common.error'),
+        description: t('customers.requiredFields'),
         variant: "destructive"
       });
       return;
@@ -93,7 +94,7 @@ const CustomersPage = () => {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-64">
-          <div className="animate-pulse text-muted-foreground">Caricamento clienti...</div>
+          <div className="animate-pulse text-muted-foreground">{t('customers.loadingCustomers')}</div>
         </div>
       </Layout>
     );
@@ -102,12 +103,12 @@ const CustomersPage = () => {
   return (
     <Layout>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <h1 className="text-2xl font-bold">Clienti</h1>
+        <h1 className="text-2xl font-bold">{t('customers.title')}</h1>
         <div className="flex w-full md:w-auto gap-2">
           <div className="relative flex-grow">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Cerca clienti..."
+              placeholder={t('customers.searchPlaceholder')}
               className="pl-8"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -115,7 +116,7 @@ const CustomersPage = () => {
           </div>
           <Button className="flex gap-1" onClick={() => setIsDialogOpen(true)}>
             <Plus className="h-4 w-4" />
-            Nuovo Cliente
+            {t('customers.newCustomer')}
           </Button>
         </div>
       </div>
@@ -133,15 +134,15 @@ const CustomersPage = () => {
                 
                 <div className="space-y-2 mt-2">
                   <div className="text-sm">
-                    <span className="text-muted-foreground">Email:</span> {customer.email}
+                    <span className="text-muted-foreground">{t('customers.email')}:</span> {customer.email}
                   </div>
                   <div className="text-sm">
-                    <span className="text-muted-foreground">Telefono:</span> {customer.phone}
+                    <span className="text-muted-foreground">{t('customers.phone')}:</span> {customer.phone}
                   </div>
                   
                   {customer.address && (
                     <div className="text-sm">
-                      <span className="text-muted-foreground">Indirizzo:</span> {customer.address}
+                      <span className="text-muted-foreground">{t('customers.address')}:</span> {customer.address}
                     </div>
                   )}
                 </div>
@@ -153,7 +154,7 @@ const CustomersPage = () => {
         {filteredCustomers.length === 0 && (
           <div className="col-span-full text-center py-8">
             <p className="text-muted-foreground">
-              {searchTerm ? 'Nessun cliente trovato con questi criteri.' : 'Nessun cliente registrato.'}
+              {searchTerm ? t('customers.noCustomersFound') : t('customers.noCustomers')}
             </p>
           </div>
         )}
@@ -163,15 +164,15 @@ const CustomersPage = () => {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Aggiungi nuovo cliente</DialogTitle>
+            <DialogTitle>{t('customers.addCustomer')}</DialogTitle>
             <DialogDescription>
-              Inserisci i dettagli del nuovo cliente. I campi con * sono obbligatori.
+              {t('customers.addCustomerDescription')}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">
-                Nome*
+                {t('customers.name')}*
               </Label>
               <Input
                 id="name"
@@ -183,7 +184,7 @@ const CustomersPage = () => {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="email" className="text-right">
-                Email*
+                {t('customers.email')}*
               </Label>
               <Input
                 id="email"
@@ -196,7 +197,7 @@ const CustomersPage = () => {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="phone" className="text-right">
-                Telefono*
+                {t('customers.phone')}*
               </Label>
               <Input
                 id="phone"
@@ -208,7 +209,7 @@ const CustomersPage = () => {
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="address" className="text-right">
-                Indirizzo
+                {t('customers.address')}
               </Label>
               <Input
                 id="address"
@@ -221,13 +222,13 @@ const CustomersPage = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-              Annulla
+              {t('common.cancel')}
             </Button>
             <Button 
               onClick={handleAddCustomer}
               disabled={createCustomerMutation.isPending}
             >
-              {createCustomerMutation.isPending ? 'Salvando...' : 'Salva'}
+              {createCustomerMutation.isPending ? t('customers.saving') : t('common.save')}
             </Button>
           </DialogFooter>
         </DialogContent>

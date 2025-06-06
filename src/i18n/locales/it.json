@@ -11,7 +11,78 @@
     "logout": "Esci",
     "my_motorcycles": "Le Mie Moto",
     "my_repairs": "Le Mie Riparazioni",
-    "my_invoices": "Le Mie Fatture"
+    "my_invoices": "Le Mie Fatture",
+    "home": "Home",
+    "back": "Indietro"
+  },
+  "app": {
+    "title": "MotoFix",
+    "description": "Sistema di gestione per officina motociclisti",
+    "nav": {
+      "workshop": "Officina",
+      "dashboard": "Dashboard",
+      "customers": "Clienti",
+      "inventory": "Inventario",
+      "invoices": "Fatture",
+      "photos": "Foto",
+      "settings": "Impostazioni"
+    }
+  },
+  "auth": {
+    "login": "Accedi",
+    "register": "Registrati",
+    "logout": "Esci",
+    "email": "Email",
+    "password": "Password",
+    "name": "Nome",
+    "role": "Ruolo",
+    "confirmPassword": "Conferma Password",
+    "loginTitle": "Accedi a MotoFix",
+    "loginSubtitle": "Inserisci le tue credenziali per accedere",
+    "registerTitle": "Registrati su MotoFix",
+    "registerSubtitle": "Crea un nuovo account",
+    "forgotPassword": "Password dimenticata?",
+    "noAccount": "Non hai un account?",
+    "hasAccount": "Hai già un account?",
+    "signInHere": "Accedi qui",
+    "signUpHere": "Registrati qui",
+    "signing": "Accesso in corso...",
+    "registering": "Registrazione in corso...",
+    "selectRole": "Seleziona il tuo ruolo"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Benvenuto, {name}",
+    "overview": "Panoramica",
+    "totalRepairs": "Riparazioni Totali",
+    "pendingRepairs": "Riparazioni in Attesa",
+    "completedRepairs": "Riparazioni Completate",
+    "totalCustomers": "Clienti Totali",
+    "recentRepairs": "Riparazioni Recenti",
+    "viewAll": "Vedi Tutte",
+    "noRepairs": "Nessuna riparazione disponibile",
+    "quickActions": "Azioni Rapide",
+    "newRepair": "Nuova Riparazione",
+    "newCustomer": "Nuovo Cliente",
+    "viewInventory": "Visualizza Inventario"
+  },
+  "customers": {
+    "title": "Clienti",
+    "newCustomer": "Nuovo Cliente",
+    "searchPlaceholder": "Cerca clienti...",
+    "noCustomers": "Nessun cliente registrato.",
+    "noCustomersFound": "Nessun cliente trovato con questi criteri.",
+    "addCustomer": "Aggiungi nuovo cliente",
+    "addCustomerDescription": "Inserisci i dettagli del nuovo cliente. I campi con * sono obbligatori.",
+    "customerAdded": "Cliente aggiunto",
+    "customerAddedSuccess": "{name} è stato aggiunto con successo.",
+    "requiredFields": "I campi Nome, Email e Telefono sono obbligatori.",
+    "name": "Nome",
+    "email": "Email",
+    "phone": "Telefono",
+    "address": "Indirizzo",
+    "saving": "Salvando...",
+    "loadingCustomers": "Caricamento clienti..."
   },
   "repairs": {
     "title": "Riparazioni",
@@ -31,6 +102,17 @@
     "save": "Salva",
     "cancel": "Annulla",
     "loading": "Caricamento...",
-    "no_data": "Nessun dato disponibile"
+    "no_data": "Nessun dato disponibile",
+    "error": "Errore",
+    "success": "Successo"
+  },
+  "error": {
+    "accessDenied": "Accesso Negato",
+    "noPermission": "Non hai i permessi per accedere a questa pagina"
+  },
+  "roles": {
+    "admin": "Amministratore",
+    "tecnico": "Tecnico",
+    "cliente": "Cliente"
   }
 }

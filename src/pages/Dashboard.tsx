@@ -1,248 +1,199 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import Layout from '@/components/Layout';
 import StatsCard from '@/components/StatsCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { getRepairs } from '@/api/repairs';
+import { getCustomers } from '@/api/customers';
 import { useAuth } from '@/context/AuthContext';
-import { UserRole } from '@/types';
-import { 
-  Users, 
-  Wrench, 
-  Package, 
-  FileText, 
-  Camera,
-  Settings,
-  Plus,
-  Bike,
-  DollarSign,
-  Clock,
-  CheckCircle
-} from 'lucide-react';
+import { Wrench, Users, Plus, Package } from 'lucide-react';
 
 const Dashboard = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user, hasRole } = useAuth();
 
-  if (!user) {
-    return null;
-  }
+  // Fetch repairs data
+  const { data: repairs = [], isLoading: repairsLoading } = useQuery({
+    queryKey: ['repairs'],
+    queryFn: getRepairs,
+    enabled: hasRole(['admin', 'tecnico'])
+  });
 
-  // Dashboard per clienti
-  if (hasRole('cliente')) {
+  // Fetch customers data
+  const { data: customers = [], isLoading: customersLoading } = useQuery({
+    queryKey: ['customers'],
+    queryFn: getCustomers,
+    enabled: hasRole(['admin', 'tecnico'])
+  });
+
+  const totalRepairs = repairs.length;
+  const pendingRepairs = repairs.filter(r => r.status === 'pending').length;
+  const completedRepairs = repairs.filter(r => r.status === 'completed').length;
+  const totalCustomers = customers.length;
+
+  // Recent repairs (last 5)
+  const recentRepairs = repairs
+    .sort((a, b) => new Date(b.dateCreated).getTime() - new Date(a.dateCreated).getTime())
+    .slice(0, 5);
+
+  if (repairsLoading || customersLoading) {
     return (
       <Layout>
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold">Benvenuto, {user.name}!</h1>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <StatsCard
-              title="Le Mie Motociclette"
-              value="0"
-              description="Motociclette registrate"
-              icon={<Bike className="h-4 w-4" />}
-            />
-            <StatsCard
-              title="Riparazioni Attive"
-              value="0"
-              description="In lavorazione"
-              icon={<Wrench className="h-4 w-4" />}
-            />
-            <StatsCard
-              title="Fatture in Sospeso"
-              value="€0"
-              description="Da pagare"
-              icon={<DollarSign className="h-4 w-4" />}
-            />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  Riparazioni Recenti
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Non hai riparazioni in corso al momento.
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
-                  Fatture Recenti
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Non hai fatture recenti.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+        <div className="flex items-center justify-center min-h-64">
+          <div className="animate-pulse text-muted-foreground">{t('common.loading')}</div>
         </div>
       </Layout>
     );
   }
 
-  // Dashboard per admin e tecnici
   return (
     <Layout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">{t('app.nav.dashboard')}</h1>
-          <div className="flex gap-2">
-            {hasRole(['admin', 'tecnico'] as UserRole[]) && (
-              <Button onClick={() => navigate('/repairs/new')} className="flex gap-2">
-                <Plus className="h-4 w-4" />
-                Nuova Riparazione
-              </Button>
-            )}
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold">{t('dashboard.title')}</h1>
+          <p className="text-muted-foreground">
+            {t('dashboard.welcome', { name: user?.name || 'Utente' })}
+          </p>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatsCard
-            title="Clienti Totali"
-            value="0"
-            description="Clienti registrati"
-            icon={<Users className="h-4 w-4" />}
-          />
-          <StatsCard
-            title="Riparazioni Attive"
-            value="0"
-            description="In lavorazione"
-            icon={<Wrench className="h-4 w-4" />}
-          />
-          <StatsCard
-            title="Parti in Inventario"
-            value="0"
-            description="Pezzi disponibili"
-            icon={<Package className="h-4 w-4" />}
-          />
-          <StatsCard
-            title="Fatture del Mese"
-            value="€0"
-            description="Entrate mensili"
-            icon={<FileText className="h-4 w-4" />}
-          />
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card 
-            className="cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => navigate('/customers')}
-          >
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                {t('app.nav.customers')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Gestisci i clienti e le loro informazioni
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card 
-            className="cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => navigate('/repairs')}
-          >
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Wrench className="h-5 w-5" />
-                Riparazioni
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Gestisci le riparazioni in corso
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card 
-            className="cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => navigate('/inventory')}
-          >
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Package className="h-5 w-5" />
-                {t('app.nav.inventory')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Gestisci l'inventario dei pezzi di ricambio
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card 
-            className="cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => navigate('/invoices')}
-          >
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                {t('app.nav.invoices')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Gestisci fatture e pagamenti
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card 
-            className="cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => navigate('/photos')}
-          >
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Camera className="h-5 w-5" />
-                {t('app.nav.photos')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Visualizza foto delle riparazioni
-              </p>
-            </CardContent>
-          </Card>
-          
-          {hasRole('admin') && (
-            <Card 
-              className="cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => navigate('/settings')}
-            >
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="h-5 w-5" />
-                  {t('app.nav.settings')}
-                </CardTitle>
+
+        {hasRole(['admin', 'tecnico']) && (
+          <>
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <StatsCard
+                title={t('dashboard.totalRepairs')}
+                value={totalRepairs}
+                icon={Wrench}
+                trend={{ value: 12, isPositive: true }}
+              />
+              <StatsCard
+                title={t('dashboard.pendingRepairs')}
+                value={pendingRepairs}
+                icon={Wrench}
+                trend={{ value: 5, isPositive: false }}
+              />
+              <StatsCard
+                title={t('dashboard.completedRepairs')}
+                value={completedRepairs}
+                icon={Wrench}
+                trend={{ value: 8, isPositive: true }}
+              />
+              <StatsCard
+                title={t('dashboard.totalCustomers')}
+                value={totalCustomers}
+                icon={Users}
+                trend={{ value: 3, isPositive: true }}
+              />
+            </div>
+
+            {/* Recent Repairs */}
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>{t('dashboard.recentRepairs')}</CardTitle>
+                <Button variant="outline" onClick={() => navigate('/repairs')}>
+                  {t('dashboard.viewAll')}
+                </Button>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">
-                  Configurazioni di sistema
-                </p>
+                {recentRepairs.length === 0 ? (
+                  <p className="text-muted-foreground text-center py-4">
+                    {t('dashboard.noRepairs')}
+                  </p>
+                ) : (
+                  <div className="space-y-4">
+                    {recentRepairs.map((repair) => (
+                      <div key={repair.id} className="flex items-center justify-between border-b pb-2">
+                        <div>
+                          <p className="font-medium">{repair.title}</p>
+                          <p className="text-sm text-muted-foreground">{repair.description}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(repair.dateCreated).toLocaleDateString('it-IT')}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
-          )}
-        </div>
+
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('dashboard.quickActions')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Button className="h-20 flex flex-col gap-2" onClick={() => navigate('/repairs/new')}>
+                    <Wrench className="h-6 w-6" />
+                    {t('dashboard.newRepair')}
+                  </Button>
+                  <Button className="h-20 flex flex-col gap-2" variant="outline" onClick={() => navigate('/customers')}>
+                    <Users className="h-6 w-6" />
+                    {t('dashboard.newCustomer')}
+                  </Button>
+                  <Button className="h-20 flex flex-col gap-2" variant="outline" onClick={() => navigate('/inventory')}>
+                    <Package className="h-6 w-6" />
+                    {t('dashboard.viewInventory')}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </>
+        )}
+
+        {hasRole('cliente') && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/my-motorcycles')}>
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-4">
+                  <div className="bg-primary/10 p-3 rounded-full">
+                    <Wrench className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">{t('nav.my_motorcycles')}</h3>
+                    <p className="text-sm text-muted-foreground">Gestisci le tue motociclette</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/my-repairs')}>
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-4">
+                  <div className="bg-primary/10 p-3 rounded-full">
+                    <Wrench className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">{t('nav.my_repairs')}</h3>
+                    <p className="text-sm text-muted-foreground">Visualizza le tue riparazioni</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/my-invoices')}>
+              <CardContent className="p-6">
+                <div className="flex items-center space-x-4">
+                  <div className="bg-primary/10 p-3 rounded-full">
+                    <Wrench className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">{t('nav.my_invoices')}</h3>
+                    <p className="text-sm text-muted-foreground">Visualizza le tue fatture</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     </Layout>
   );

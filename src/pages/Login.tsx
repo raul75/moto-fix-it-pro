@@ -1,127 +1,63 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
-
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 import LanguageSelector from '@/components/LanguageSelector';
 import { Wrench } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
   const { toast } = useToast();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [loginError, setLoginError] = useState<string | null>(null);
-  
-  // Redirect se l'utente è già autenticato
-  React.useEffect(() => {
+  const [error, setError] = useState('');
+
+  // Redirect if already authenticated
+  useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
-  
-  // Schema di validazione con Zod
-  const formSchema = z.object({
-    email: z.string().email(t('validation.emailInvalid')),
-    password: z.string().min(6, t('validation.passwordMin', { count: 6 })),
-  });
 
-  // Form con react-hook-form
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-  });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError('');
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      setLoginError(null);
-      setIsLoading(true);
+      const { error } = await login(email, password);
       
-      console.log("Login attempt with:", values.email);
-      const success = await login(values.email, values.password);
-      
-      if (success) {
+      if (error) {
+        setError(error.message);
         toast({
-          title: t('auth.loginSuccess'),
-          description: t('auth.welcomeBack'),
+          title: t('common.error'),
+          description: error.message,
+          variant: "destructive"
         });
-        navigate('/');
       } else {
-        setLoginError(t('auth.invalidCredentials'));
         toast({
-          title: t('auth.loginFailed'),
-          description: t('auth.checkCredentials'),
-          variant: "destructive",
+          title: t('common.success'),
+          description: "Accesso effettuato con successo",
         });
+        navigate('/dashboard');
       }
-    } catch (error) {
-      console.error('Login error:', error);
-      setLoginError(error instanceof Error ? error.message : t('auth.unknownError'));
+    } catch (err: any) {
+      const errorMessage = err.message || 'Errore durante il login';
+      setError(errorMessage);
       toast({
-        title: t('auth.loginFailed'),
-        description: error instanceof Error ? error.message : t('auth.unknownError'),
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Function to handle demo login
-  const handleDemoLogin = async () => {
-    try {
-      setLoginError(null);
-      setIsLoading(true);
-      
-      // Since this is just for demonstration, use test credentials
-      const demoEmail = "demo@motofix.it";
-      const demoPassword = "demo123";
-      
-      console.log("Demo login attempt");
-      const success = await login(demoEmail, demoPassword);
-      
-      if (success) {
-        toast({
-          title: t('auth.demoLoginSuccess'),
-          description: t('auth.welcomeToDemo'),
-        });
-        navigate('/');
-      } else {
-        setLoginError(t('auth.demoLoginFailed'));
-        toast({
-          title: t('auth.demoLoginFailed'),
-          description: t('auth.contactAdmin'),
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      console.error('Demo login error:', error);
-      setLoginError(error instanceof Error ? error.message : t('auth.unknownError'));
-      toast({
-        title: t('auth.loginFailed'),
-        description: error instanceof Error ? error.message : t('auth.unknownError'),
-        variant: "destructive",
+        title: t('common.error'),
+        description: errorMessage,
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
@@ -129,87 +65,87 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-accent/10 p-6">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-background to-accent/10 p-4">
       <div className="absolute top-4 right-4">
         <LanguageSelector />
       </div>
-      
-      <div className="mb-8 text-center">
-        <div className="flex justify-center mb-4">
-          <div className="bg-primary text-primary-foreground p-4 rounded-full">
-            <Wrench className="h-12 w-12" />
+
+      <div className="w-full max-w-md space-y-6">
+        <div className="text-center">
+          <div className="flex justify-center mb-4">
+            <div className="bg-primary text-primary-foreground p-4 rounded-full">
+              <Wrench className="h-8 w-8" />
+            </div>
           </div>
+          <h1 className="text-2xl font-bold">{t('auth.loginTitle')}</h1>
+          <p className="text-muted-foreground">{t('auth.loginSubtitle')}</p>
         </div>
-        <h1 className="text-3xl font-bold">{t('app.title')}</h1>
-        <p className="text-muted-foreground">{t('app.description')}</p>
-      </div>
-      
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>{t('auth.login')}</CardTitle>
-          <CardDescription>{t('auth.loginDesc')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {loginError && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{loginError}</AlertDescription>
-            </Alert>
-          )}
-          
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('auth.email')}</FormLabel>
-                    <FormControl>
-                      <Input placeholder="email@example.com" type="email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('auth.password')}</FormLabel>
-                    <FormControl>
-                      <Input type="password" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? t('common.loading') : t('auth.loginButton')}
+
+        <Card>
+          <form onSubmit={handleSubmit}>
+            <CardHeader className="space-y-1">
+              <CardTitle className="text-xl text-center">{t('auth.login')}</CardTitle>
+              <CardDescription className="text-center">
+                {t('auth.loginSubtitle')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              
+              <div className="space-y-2">
+                <Label htmlFor="email">{t('auth.email')}</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="esempio@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="password">{t('auth.password')}</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
+            </CardContent>
+            <CardFooter className="flex flex-col space-y-4">
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={isLoading}
+              >
+                {isLoading ? t('auth.signing') : t('auth.login')}
               </Button>
-            </form>
-          </Form>
-          
-          <div className="mt-4">
-            <Button 
-              variant="outline" 
-              className="w-full" 
-              onClick={handleDemoLogin}
-              disabled={isLoading}
-            >
-              {t('auth.demoLogin')}
-            </Button>
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col gap-2">
-          <p>
-            {t('auth.noAccount')} <Link to="/register" className="text-primary hover:underline">{t('auth.registerHere')}</Link>
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {t('auth.demoNote')}
-          </p>
-        </CardFooter>
-      </Card>
+              
+              <div className="text-center text-sm">
+                <span className="text-muted-foreground">{t('auth.noAccount')} </span>
+                <Link to="/register" className="text-primary hover:underline">
+                  {t('auth.signUpHere')}
+                </Link>
+              </div>
+            </CardFooter>
+          </form>
+        </Card>
+
+        <div className="text-center">
+          <Link to="/" className="text-sm text-muted-foreground hover:text-primary">
+            ← {t('nav.back')}
+          </Link>
+        </div>
+      </div>
     </div>
   );
 };
