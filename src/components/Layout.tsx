@@ -1,172 +1,154 @@
 
-import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/context/AuthContext';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Separator } from '@/components/ui/separator';
 import LanguageSelector from '@/components/LanguageSelector';
-import { UserRole } from '@/types';
-import { 
-  Home, 
-  Users, 
-  Package, 
-  FileText, 
-  Camera, 
-  Settings, 
-  LogOut,
-  Wrench,
-  Bike
-} from 'lucide-react';
+import { Home, Users, Package, FileText, Camera, Settings, Menu, LogOut, Wrench } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
-interface NavItem {
-  path: string;
-  label: string;
-  icon: any;
-  roles?: UserRole[];
-}
-
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { user, logout } = useAuth();
   const { t } = useTranslation();
-  const { user, logout, hasRole } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const isAdmin = user?.user_metadata?.role === 'admin';
+  const isTechnician = user?.user_metadata?.role === 'tecnico';
+  const isCustomer = user?.user_metadata?.role === 'cliente';
 
   const handleLogout = async () => {
-    await logout();
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
-  const isActive = (path: string) => {
-    return location.pathname === path;
+  const adminNavItems = [
+    { to: '/dashboard', icon: <Home className="h-4 w-4" />, label: t('app.nav.dashboard') },
+    { to: '/customers', icon: <Users className="h-4 w-4" />, label: t('app.nav.customers') },
+    { to: '/repairs', icon: <Wrench className="h-4 w-4" />, label: 'Riparazioni' },
+    { to: '/inventory', icon: <Package className="h-4 w-4" />, label: t('app.nav.inventory') },
+    { to: '/invoices', icon: <FileText className="h-4 w-4" />, label: t('app.nav.invoices') },
+    { to: '/photos', icon: <Camera className="h-4 w-4" />, label: t('app.nav.photos') },
+    { to: '/settings', icon: <Settings className="h-4 w-4" />, label: t('app.nav.settings') },
+  ];
+
+  const technicianNavItems = [
+    { to: '/dashboard', icon: <Home className="h-4 w-4" />, label: t('app.nav.dashboard') },
+    { to: '/customers', icon: <Users className="h-4 w-4" />, label: t('app.nav.customers') },
+    { to: '/repairs', icon: <Wrench className="h-4 w-4" />, label: 'Riparazioni' },
+    { to: '/inventory', icon: <Package className="h-4 w-4" />, label: t('app.nav.inventory') },
+    { to: '/photos', icon: <Camera className="h-4 w-4" />, label: t('app.nav.photos') },
+  ];
+
+  const customerNavItems = [
+    { to: '/my-motorcycles', icon: <Wrench className="h-4 w-4" />, label: 'Le Mie Moto' },
+    { to: '/my-repairs', icon: <Settings className="h-4 w-4" />, label: 'Le Mie Riparazioni' },
+    { to: '/my-invoices', icon: <FileText className="h-4 w-4" />, label: 'Le Mie Fatture' },
+  ];
+
+  const getNavItems = () => {
+    if (isAdmin) return adminNavItems;
+    if (isTechnician) return technicianNavItems;
+    if (isCustomer) return customerNavItems;
+    return [];
   };
 
-  // Navigation items per admin e tecnici
-  const adminNavItems: NavItem[] = [
-    { 
-      path: '/dashboard', 
-      label: t('app.nav.dashboard'), 
-      icon: Home 
-    },
-    { 
-      path: '/customers', 
-      label: t('app.nav.customers'), 
-      icon: Users,
-      roles: ['admin', 'tecnico']
-    },
-    { 
-      path: '/repairs', 
-      label: 'Riparazioni', 
-      icon: Wrench,
-      roles: ['admin', 'tecnico']
-    },
-    { 
-      path: '/inventory', 
-      label: t('app.nav.inventory'), 
-      icon: Package,
-      roles: ['admin', 'tecnico']
-    },
-    { 
-      path: '/invoices', 
-      label: t('app.nav.invoices'), 
-      icon: FileText,
-      roles: ['admin', 'tecnico']
-    },
-    { 
-      path: '/photos', 
-      label: t('app.nav.photos'), 
-      icon: Camera,
-      roles: ['admin', 'tecnico']
-    },
-    { 
-      path: '/settings', 
-      label: t('app.nav.settings'), 
-      icon: Settings,
-      roles: ['admin']
-    }
-  ];
+  const navItems = getNavItems();
 
-  // Navigation items per clienti
-  const customerNavItems: NavItem[] = [
-    { 
-      path: '/dashboard', 
-      label: 'Dashboard', 
-      icon: Home 
-    },
-    { 
-      path: '/my-motorcycles', 
-      label: 'Le Mie Moto', 
-      icon: Bike 
-    },
-    { 
-      path: '/my-repairs', 
-      label: 'Le Mie Riparazioni', 
-      icon: Wrench 
-    },
-    { 
-      path: '/my-invoices', 
-      label: 'Le Mie Fatture', 
-      icon: FileText 
-    }
-  ];
-
-  const navItems = hasRole('cliente') ? customerNavItems : adminNavItems;
+  const NavContent = () => (
+    <>
+      <div className="flex items-center gap-3 px-6 py-4">
+        <img 
+          src="/lovable-uploads/5b289d77-4537-4aa6-b011-df0e4cd7b186.png" 
+          alt="MotoFix Logo" 
+          className="h-8 w-auto"
+        />
+        <div>
+          <h1 className="text-lg font-bold">{t('app.title')}</h1>
+          <p className="text-xs text-muted-foreground">{t('app.description')}</p>
+        </div>
+      </div>
+      <Separator />
+      <nav className="flex-1 p-4">
+        <ul className="space-y-2">
+          {navItems.map((item) => (
+            <li key={item.to}>
+              <Link
+                to={item.to}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground ${
+                  location.pathname === item.to
+                    ? 'bg-accent text-accent-foreground'
+                    : 'text-muted-foreground'
+                }`}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {item.icon}
+                {item.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <div className="p-4">
+        <Separator className="mb-4" />
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
+              <span className="text-xs font-medium text-primary-foreground">
+                {user?.email?.charAt(0).toUpperCase()}
+              </span>
+            </div>
+            <div className="text-xs">
+              <p className="font-medium">{user?.email}</p>
+              <p className="text-muted-foreground capitalize">{user?.user_metadata?.role}</p>
+            </div>
+          </div>
+          <LanguageSelector />
+        </div>
+        <Button variant="outline" size="sm" onClick={handleLogout} className="w-full">
+          <LogOut className="h-4 w-4 mr-2" />
+          {t('auth.logout')}
+        </Button>
+      </div>
+    </>
+  );
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-white shadow-sm">
-        <div className="flex h-16 items-center justify-between px-6">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-xl font-bold text-primary">MotoFix</h1>
-            {user && (
-              <span className="text-sm text-muted-foreground">
-                {user.name} ({hasRole('admin') ? 'Admin' : hasRole('tecnico') ? 'Tecnico' : 'Cliente'})
-              </span>
-            )}
-          </div>
-          <div className="flex items-center space-x-4">
-            <LanguageSelector />
-            <Button variant="outline" size="sm" onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              {t('auth.logout')}
-            </Button>
-          </div>
-        </div>
-      </header>
+    <div className="flex h-screen bg-background">
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex md:w-64 md:flex-col md:border-r">
+        <NavContent />
+      </aside>
 
-      <div className="flex">
-        {/* Sidebar */}
-        <aside className="w-64 border-r bg-muted/30 min-h-[calc(100vh-4rem)]">
-          <nav className="p-4 space-y-2">
-            {navItems.map((item) => {
-              // Check if user has required role for this nav item
-              if (item.roles && !hasRole(item.roles)) {
-                return null;
-              }
+      {/* Mobile Menu */}
+      <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon" className="md:hidden fixed top-4 left-4 z-50">
+            <Menu className="h-5 w-5" />
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-64 p-0">
+          <NavContent />
+        </SheetContent>
+      </Sheet>
 
-              return (
-                <Button
-                  key={item.path}
-                  variant={isActive(item.path) ? 'default' : 'ghost'}
-                  className="w-full justify-start"
-                  onClick={() => navigate(item.path)}
-                >
-                  <item.icon className="mr-2 h-4 w-4" />
-                  {item.label}
-                </Button>
-              );
-            })}
-          </nav>
-        </aside>
-
-        {/* Main Content */}
-        <main className="flex-1 p-6">
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 overflow-auto p-6">
           {children}
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   );
 };
