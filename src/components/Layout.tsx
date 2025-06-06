@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -20,9 +19,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const isAdmin = user?.user_metadata?.role === 'admin';
-  const isTechnician = user?.user_metadata?.role === 'tecnico';
-  const isCustomer = user?.user_metadata?.role === 'cliente';
+  const isAdmin = user?.role === 'admin';
+  const isTechnician = user?.role === 'tecnico';
+  const isCustomer = user?.role === 'cliente';
 
   const handleLogout = async () => {
     try {
@@ -111,7 +110,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
             <div className="text-xs">
               <p className="font-medium">{user?.email}</p>
-              <p className="text-muted-foreground capitalize">{user?.user_metadata?.role}</p>
+              <p className="text-muted-foreground capitalize">{user?.role}</p>
             </div>
           </div>
           <LanguageSelector />
