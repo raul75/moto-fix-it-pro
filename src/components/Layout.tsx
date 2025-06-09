@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -33,27 +34,27 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   const adminNavItems = [
-    { to: '/dashboard', icon: <Home className="h-4 w-4" />, label: t('app.nav.dashboard') },
-    { to: '/customers', icon: <Users className="h-4 w-4" />, label: t('app.nav.customers') },
-    { to: '/repairs', icon: <Wrench className="h-4 w-4" />, label: 'Riparazioni' },
-    { to: '/inventory', icon: <Package className="h-4 w-4" />, label: t('app.nav.inventory') },
-    { to: '/invoices', icon: <FileText className="h-4 w-4" />, label: t('app.nav.invoices') },
-    { to: '/photos', icon: <Camera className="h-4 w-4" />, label: t('app.nav.photos') },
-    { to: '/settings', icon: <Settings className="h-4 w-4" />, label: t('app.nav.settings') },
+    { to: '/dashboard', icon: <Home className="h-4 w-4" />, label: t('nav.dashboard') },
+    { to: '/customers', icon: <Users className="h-4 w-4" />, label: t('nav.customers') },
+    { to: '/repairs', icon: <Wrench className="h-4 w-4" />, label: t('nav.repairs') },
+    { to: '/inventory', icon: <Package className="h-4 w-4" />, label: t('nav.inventory') },
+    { to: '/invoices', icon: <FileText className="h-4 w-4" />, label: t('nav.invoices') },
+    { to: '/photos', icon: <Camera className="h-4 w-4" />, label: t('nav.photos') },
+    { to: '/settings', icon: <Settings className="h-4 w-4" />, label: t('nav.settings') },
   ];
 
   const technicianNavItems = [
-    { to: '/dashboard', icon: <Home className="h-4 w-4" />, label: t('app.nav.dashboard') },
-    { to: '/customers', icon: <Users className="h-4 w-4" />, label: t('app.nav.customers') },
-    { to: '/repairs', icon: <Wrench className="h-4 w-4" />, label: 'Riparazioni' },
-    { to: '/inventory', icon: <Package className="h-4 w-4" />, label: t('app.nav.inventory') },
-    { to: '/photos', icon: <Camera className="h-4 w-4" />, label: t('app.nav.photos') },
+    { to: '/dashboard', icon: <Home className="h-4 w-4" />, label: t('nav.dashboard') },
+    { to: '/customers', icon: <Users className="h-4 w-4" />, label: t('nav.customers') },
+    { to: '/repairs', icon: <Wrench className="h-4 w-4" />, label: t('nav.repairs') },
+    { to: '/inventory', icon: <Package className="h-4 w-4" />, label: t('nav.inventory') },
+    { to: '/photos', icon: <Camera className="h-4 w-4" />, label: t('nav.photos') },
   ];
 
   const customerNavItems = [
-    { to: '/my-motorcycles', icon: <Wrench className="h-4 w-4" />, label: 'Le Mie Moto' },
-    { to: '/my-repairs', icon: <Settings className="h-4 w-4" />, label: 'Le Mie Riparazioni' },
-    { to: '/my-invoices', icon: <FileText className="h-4 w-4" />, label: 'Le Mie Fatture' },
+    { to: '/my-motorcycles', icon: <Wrench className="h-4 w-4" />, label: t('nav.my_motorcycles') },
+    { to: '/my-repairs', icon: <Settings className="h-4 w-4" />, label: t('nav.my_repairs') },
+    { to: '/my-invoices', icon: <FileText className="h-4 w-4" />, label: t('nav.my_invoices') },
   ];
 
   const getNavItems = () => {
@@ -73,9 +74,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           alt="MotoFix Logo" 
           className="h-8 w-auto"
         />
-        <div>
-          <h1 className="text-lg font-bold">{t('app.title')}</h1>
-          <p className="text-xs text-muted-foreground">{t('app.description')}</p>
+        <div className="min-w-0">
+          <h1 className="text-lg font-bold truncate">{t('app.title')}</h1>
+          <p className="text-xs text-muted-foreground truncate">{t('app.description')}</p>
         </div>
       </div>
       <Separator />
@@ -93,7 +94,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {item.icon}
-                {item.label}
+                <span className="truncate">{item.label}</span>
               </Link>
             </li>
           ))}
@@ -102,15 +103,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="p-4">
         <Separator className="mb-4" />
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center shrink-0">
               <span className="text-xs font-medium text-primary-foreground">
                 {user?.email?.charAt(0).toUpperCase()}
               </span>
             </div>
-            <div className="text-xs">
-              <p className="font-medium">{user?.email}</p>
-              <p className="text-muted-foreground capitalize">{user?.role}</p>
+            <div className="text-xs min-w-0 flex-1">
+              <p className="font-medium truncate">{user?.email}</p>
+              <p className="text-muted-foreground capitalize truncate">{user?.role}</p>
             </div>
           </div>
           <LanguageSelector />
@@ -144,7 +145,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden">
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto p-4 md:p-6">
           {children}
         </div>
       </main>

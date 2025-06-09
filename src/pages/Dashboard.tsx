@@ -53,18 +53,18 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         <div>
-          <h1 className="text-3xl font-bold">{t('dashboard.title')}</h1>
+          <h1 className="text-2xl md:text-3xl font-bold">{t('dashboard.title')}</h1>
           <p className="text-muted-foreground">
-            {t('dashboard.welcome', { name: user?.name || 'Utente' })}
+            {t('dashboard.welcome').replace('{name}', user?.name || user?.email || 'Utente')}
           </p>
         </div>
 
         {hasRole(['admin', 'tecnico']) && (
           <>
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
               <StatsCard
                 title={t('dashboard.totalRepairs')}
                 value={totalRepairs}
@@ -93,9 +93,9 @@ const Dashboard = () => {
 
             {/* Recent Repairs */}
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>{t('dashboard.recentRepairs')}</CardTitle>
-                <Button variant="outline" onClick={() => navigate('/repairs')}>
+              <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between space-y-2 sm:space-y-0">
+                <CardTitle className="text-lg md:text-xl">{t('dashboard.recentRepairs')}</CardTitle>
+                <Button variant="outline" onClick={() => navigate('/repairs')} className="w-full sm:w-auto">
                   {t('dashboard.viewAll')}
                 </Button>
               </CardHeader>
@@ -107,12 +107,12 @@ const Dashboard = () => {
                 ) : (
                   <div className="space-y-4">
                     {recentRepairs.map((repair) => (
-                      <div key={repair.id} className="flex items-center justify-between border-b pb-2">
-                        <div>
-                          <p className="font-medium">{repair.title}</p>
-                          <p className="text-sm text-muted-foreground">{repair.description}</p>
+                      <div key={repair.id} className="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-2 space-y-2 sm:space-y-0">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium truncate">{repair.title}</p>
+                          <p className="text-sm text-muted-foreground truncate">{repair.description}</p>
                         </div>
-                        <div className="text-right">
+                        <div className="text-left sm:text-right">
                           <p className="text-sm text-muted-foreground">
                             {new Date(repair.dateCreated).toLocaleDateString('it-IT')}
                           </p>
@@ -127,20 +127,20 @@ const Dashboard = () => {
             {/* Quick Actions */}
             <Card>
               <CardHeader>
-                <CardTitle>{t('dashboard.quickActions')}</CardTitle>
+                <CardTitle className="text-lg md:text-xl">{t('dashboard.quickActions')}</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Button className="h-20 flex flex-col gap-2" onClick={() => navigate('/repairs/new')}>
-                    <Wrench className="h-6 w-6" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <Button className="h-16 md:h-20 flex flex-col gap-2 text-sm" onClick={() => navigate('/repairs/new')}>
+                    <Wrench className="h-5 w-5 md:h-6 md:w-6" />
                     {t('dashboard.newRepair')}
                   </Button>
-                  <Button className="h-20 flex flex-col gap-2" variant="outline" onClick={() => navigate('/customers')}>
-                    <Users className="h-6 w-6" />
+                  <Button className="h-16 md:h-20 flex flex-col gap-2 text-sm" variant="outline" onClick={() => navigate('/customers')}>
+                    <Users className="h-5 w-5 md:h-6 md:w-6" />
                     {t('dashboard.newCustomer')}
                   </Button>
-                  <Button className="h-20 flex flex-col gap-2" variant="outline" onClick={() => navigate('/inventory')}>
-                    <Package className="h-6 w-6" />
+                  <Button className="h-16 md:h-20 flex flex-col gap-2 text-sm" variant="outline" onClick={() => navigate('/inventory')}>
+                    <Package className="h-5 w-5 md:h-6 md:w-6" />
                     {t('dashboard.viewInventory')}
                   </Button>
                 </div>
@@ -150,44 +150,44 @@ const Dashboard = () => {
         )}
 
         {hasRole('cliente') && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/my-motorcycles')}>
-              <CardContent className="p-6">
+              <CardContent className="p-4 md:p-6">
                 <div className="flex items-center space-x-4">
-                  <div className="bg-primary/10 p-3 rounded-full">
+                  <div className="bg-primary/10 p-3 rounded-full shrink-0">
                     <Wrench className="h-6 w-6 text-primary" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold">{t('nav.my_motorcycles')}</h3>
-                    <p className="text-sm text-muted-foreground">Gestisci le tue motociclette</p>
+                  <div className="min-w-0">
+                    <h3 className="font-semibold truncate">{t('nav.my_motorcycles')}</h3>
+                    <p className="text-sm text-muted-foreground truncate">Gestisci le tue motociclette</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/my-repairs')}>
-              <CardContent className="p-6">
+              <CardContent className="p-4 md:p-6">
                 <div className="flex items-center space-x-4">
-                  <div className="bg-primary/10 p-3 rounded-full">
+                  <div className="bg-primary/10 p-3 rounded-full shrink-0">
                     <Wrench className="h-6 w-6 text-primary" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold">{t('nav.my_repairs')}</h3>
-                    <p className="text-sm text-muted-foreground">Visualizza le tue riparazioni</p>
+                  <div className="min-w-0">
+                    <h3 className="font-semibold truncate">{t('nav.my_repairs')}</h3>
+                    <p className="text-sm text-muted-foreground truncate">Visualizza le tue riparazioni</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/my-invoices')}>
-              <CardContent className="p-6">
+              <CardContent className="p-4 md:p-6">
                 <div className="flex items-center space-x-4">
-                  <div className="bg-primary/10 p-3 rounded-full">
+                  <div className="bg-primary/10 p-3 rounded-full shrink-0">
                     <Wrench className="h-6 w-6 text-primary" />
                   </div>
-                  <div>
-                    <h3 className="font-semibold">{t('nav.my_invoices')}</h3>
-                    <p className="text-sm text-muted-foreground">Visualizza le tue fatture</p>
+                  <div className="min-w-0">
+                    <h3 className="font-semibold truncate">{t('nav.my_invoices')}</h3>
+                    <p className="text-sm text-muted-foreground truncate">Visualizza le tue fatture</p>
                   </div>
                 </div>
               </CardContent>
