@@ -15,6 +15,37 @@
       "repairs": "Repairs"
     }
   },
+  "inventory": {
+    "title": "Inventory",
+    "searchPlaceholder": "Search parts...",
+    "noItems": "No parts found.",
+    "addItem": "Add Part",
+    "editItem": "Edit Part",
+    "name": "Name",
+    "category": "Category",
+    "quantity": "Quantity",
+    "price": "Price",
+    "minStock": "Minimum Stock",
+    "actions": "Actions",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "lowStock": "Low Stock",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock"
+  },
+  "photos": {
+    "title": "Photos",
+    "uploadPhoto": "Upload Photo",
+    "noPhotos": "No photos available",
+    "selectRepair": "Select Repair",
+    "repairPhotos": "Repair Photos",
+    "uploadSuccess": "Photo uploaded successfully",
+    "uploadError": "Error uploading photo",
+    "deletePhoto": "Delete Photo",
+    "confirmDelete": "Are you sure you want to delete this photo?"
+  },
   "repairs": {
     "title": "Repairs",
     "new_repair": "New Repair",
@@ -168,7 +199,18 @@
     "registerError": "Error registering the account. Please try again.",
     "emailInUse": "This email is already in use.",
     "logout": "Logout",
-    "phone": "Phone"
+    "phone": "Phone",
+    "loginTitle": "Login to MotoFix",
+    "loginSubtitle": "Enter your credentials to access",
+    "registerTitle": "Register to MotoFix",
+    "registerSubtitle": "Create a new account",
+    "forgotPassword": "Forgot password?",
+    "hasAccount": "Already have an account?",
+    "signInHere": "Sign in here",
+    "signUpHere": "Sign up here",
+    "signing": "Signing in...",
+    "registering": "Registering...",
+    "selectRole": "Select your role"
   },
   "validation": {
     "emailInvalid": "Invalid email",

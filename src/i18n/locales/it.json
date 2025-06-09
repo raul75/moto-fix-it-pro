@@ -28,6 +28,37 @@
       "settings": "Impostazioni"
     }
   },
+  "inventory": {
+    "title": "Inventario",
+    "searchPlaceholder": "Cerca ricambi...",
+    "noItems": "Nessun ricambio trovato.",
+    "addItem": "Aggiungi Ricambio",
+    "editItem": "Modifica Ricambio",
+    "name": "Nome",
+    "category": "Categoria",
+    "quantity": "Quantità",
+    "price": "Prezzo",
+    "minStock": "Scorta Minima",
+    "actions": "Azioni",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "lowStock": "Scorta Bassa",
+    "inStock": "Disponibile",
+    "outOfStock": "Esaurito"
+  },
+  "photos": {
+    "title": "Foto",
+    "uploadPhoto": "Carica Foto",
+    "noPhotos": "Nessuna foto disponibile",
+    "selectRepair": "Seleziona Riparazione",
+    "repairPhotos": "Foto Riparazione",
+    "uploadSuccess": "Foto caricata con successo",
+    "uploadError": "Errore durante il caricamento",
+    "deletePhoto": "Elimina Foto",
+    "confirmDelete": "Sei sicuro di voler eliminare questa foto?"
+  },
   "settings": {
     "title": "Impostazioni",
     "tabs": {

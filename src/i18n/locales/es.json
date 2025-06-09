@@ -14,6 +14,37 @@
       "workshop": "Nuestro Taller"
     }
   },
+  "inventory": {
+    "title": "Inventario",
+    "searchPlaceholder": "Buscar repuestos...",
+    "noItems": "No se encontraron repuestos.",
+    "addItem": "Añadir Repuesto",
+    "editItem": "Editar Repuesto",
+    "name": "Nombre",
+    "category": "Categoría",
+    "quantity": "Cantidad",
+    "price": "Precio",
+    "minStock": "Stock Mínimo",
+    "actions": "Acciones",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "lowStock": "Stock Bajo",
+    "inStock": "En Stock",
+    "outOfStock": "Agotado"
+  },
+  "photos": {
+    "title": "Fotos",
+    "uploadPhoto": "Subir Foto",
+    "noPhotos": "No hay fotos disponibles",
+    "selectRepair": "Seleccionar Reparación",
+    "repairPhotos": "Fotos de Reparación",
+    "uploadSuccess": "Foto subida exitosamente",
+    "uploadError": "Error al subir la foto",
+    "deletePhoto": "Eliminar Foto",
+    "confirmDelete": "¿Estás seguro de que quieres eliminar esta foto?"
+  },
   "repairs": {
     "title": "Reparaciones",
     "newRepair": "Nueva Reparación",
@@ -173,7 +204,19 @@
     "registerError": "Error al registrar la cuenta. Inténtalo de nuevo.",
     "emailInUse": "Este correo electrónico ya está en uso.",
     "logout": "Cerrar Sesión",
-    "phone": "Teléfono"
+    "phone": "Teléfono",
+    "loginTitle": "Iniciar Sesión en MotoFix",
+    "loginSubtitle": "Ingresa tus credenciales para acceder",
+    "registerTitle": "Registrarse en MotoFix",
+    "registerSubtitle": "Crea una nueva cuenta",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "hasAccount": "¿Ya tienes una cuenta?",
+    "signInHere": "Inicia sesión aquí",
+    "signUpHere": "Regístrate aquí",
+    "signing": "Iniciando sesión...",
+    "registering": "Registrando...",
+    "selectRole": "Selecciona tu rol",
+    "role": "Rol"
   },
   "validation": {
     "emailInvalid": "Email no válido",
