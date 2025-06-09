@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -64,13 +63,23 @@ const RepairDetailsPage = () => {
   // Update repair mutation
   const updateRepairMutation = useMutation({
     mutationFn: ({ id, updates }: { id: string, updates: any }) => updateRepair(id, updates),
-    onSuccess: () => {
+    onSuccess: (updatedRepair) => {
       queryClient.invalidateQueries({ queryKey: ['repair', id] });
+      queryClient.invalidateQueries({ queryKey: ['invoices'] }); // Refresh invoices list
       setIsEditing(false);
-      toast({
-        title: t('repairs.repairUpdated'),
-        description: t('repairs.updateSuccess'),
-      });
+      
+      // Show different messages based on status change
+      if (editData.status === 'completed' && updatedRepair.status === 'completed') {
+        toast({
+          title: t('repairs.repairCompleted'),
+          description: "La riparazione è stata completata e la fattura è stata generata automaticamente.",
+        });
+      } else {
+        toast({
+          title: t('repairs.repairUpdated'),
+          description: t('repairs.updateSuccess'),
+        });
+      }
     },
     onError: (error: any) => {
       toast({

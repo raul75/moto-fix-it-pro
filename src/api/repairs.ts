@@ -1,6 +1,7 @@
 import supabase from '@/lib/supabase';
 import { Repair, RepairStatus, Photo, UsedPart } from '@/types';
 import { consumeInventoryPart } from '@/api/inventory';
+import { createInvoiceInDb } from '@/api/invoices';
 
 // Convert Supabase repair to our app's Repair type
 const mapRepair = (dbRepair: any): Repair => ({
@@ -149,7 +150,7 @@ export async function createRepairInDb(repair: Omit<Repair, 'id' | 'dateCreated'
   };
 }
 
-// Update a repair
+// Update a repair - UPDATED to auto-generate invoice when completed
 export async function updateRepair(id: string, updates: Partial<Repair>): Promise<Repair> {
   const updateData: any = {
     date_updated: new Date().toISOString()
@@ -163,6 +164,11 @@ export async function updateRepair(id: string, updates: Partial<Repair>): Promis
   if (updates.notes !== undefined) updateData.notes = updates.notes;
   if (updates.dateCompleted !== undefined) updateData.date_completed = updates.dateCompleted;
   
+  // If status is being updated to completed, set completion date
+  if (updates.status === 'completed') {
+    updateData.date_completed = new Date().toISOString();
+  }
+  
   const { data, error } = await supabase
     .from('repairs')
     .update(updateData)
@@ -174,7 +180,46 @@ export async function updateRepair(id: string, updates: Partial<Repair>): Promis
     throw new Error(error.message);
   }
   
+  // Auto-generate invoice when repair is completed
+  if (updates.status === 'completed') {
+    try {
+      const completedRepair = await getRepairById(id);
+      await generateInvoiceForRepair(completedRepair);
+      console.log(`Invoice automatically generated for completed repair ${id}`);
+    } catch (invoiceError) {
+      console.error('Error generating invoice for completed repair:', invoiceError);
+      // Don't throw here to avoid blocking the repair update
+    }
+  }
+  
   return await getRepairById(id); // Fetch the complete repair with photos and parts
+}
+
+// Generate invoice for a completed repair
+async function generateInvoiceForRepair(repair: Repair): Promise<void> {
+  // Calculate costs
+  const partsCost = repair.parts?.reduce((sum, part) => sum + (part.priceEach * part.quantity), 0) || 0;
+  const laborCost = (repair.laborHours || 0) * (repair.laborRate || 0);
+  const subtotal = partsCost + laborCost;
+  const tax = subtotal * 0.22; // 22% IVA
+  const total = subtotal + tax;
+  
+  // Generate invoice number
+  const invoiceNumber = `INV-${new Date().getFullYear()}-${Date.now()}`;
+  
+  // Create invoice
+  await createInvoiceInDb({
+    repairId: repair.id,
+    customerId: repair.customerId,
+    number: invoiceNumber,
+    date: new Date().toISOString(),
+    dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+    subtotal,
+    tax,
+    total,
+    status: 'draft',
+    notes: `Fattura generata automaticamente per la riparazione: ${repair.title}`
+  });
 }
 
 // Add a photo to a repair
