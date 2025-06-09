@@ -5,11 +5,29 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Search, Download } from 'lucide-react';
-import { invoices, customers } from '@/data/mockData';
+import { Plus, Search, Download, Edit, Eye } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { getInvoices, getCustomers } from '@/api/customers';
+import { Invoice, Customer } from '@/types';
+import { useToast } from '@/hooks/use-toast';
+import EditInvoiceDialog from '@/components/dialogs/EditInvoiceDialog';
 
 const InvoicesPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const { toast } = useToast();
+
+  // Fetch data
+  const { data: invoices = [], isLoading: isLoadingInvoices } = useQuery({
+    queryKey: ['invoices'],
+    queryFn: getInvoices
+  });
+
+  const { data: customers = [] } = useQuery({
+    queryKey: ['customers'],
+    queryFn: getCustomers
+  });
 
   // Status mapping for invoices
   const invoiceStatusMap = {
@@ -47,6 +65,94 @@ const InvoicesPage = () => {
       customerName.includes(searchLower)
     );
   });
+
+  const handleEditInvoice = (invoice: Invoice) => {
+    setSelectedInvoice(invoice);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleDownloadInvoice = (invoice: Invoice) => {
+    // Generate PDF content
+    const customerName = getCustomerName(invoice.customerId);
+    const content = `
+FATTURA: ${invoice.number}
+Cliente: ${customerName}
+Data: ${invoice.date}
+Scadenza: ${invoice.dueDate}
+
+Subtotale: €${invoice.subtotal.toFixed(2)}
+IVA: €${invoice.tax.toFixed(2)}
+TOTALE: €${invoice.total.toFixed(2)}
+
+${invoice.notes ? 'Note: ' + invoice.notes : ''}
+    `;
+
+    // Create and download file
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Fattura_${invoice.number}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Download completato",
+      description: `Fattura ${invoice.number} scaricata con successo`,
+    });
+  };
+
+  const handlePrintInvoice = (invoice: Invoice) => {
+    const customerName = getCustomerName(invoice.customerId);
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Fattura ${invoice.number}</title>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 20px; }
+              .header { text-align: center; margin-bottom: 30px; }
+              .invoice-details { margin-bottom: 20px; }
+              .totals { text-align: right; margin-top: 20px; }
+            </style>
+          </head>
+          <body>
+            <div class="header">
+              <h1>FATTURA</h1>
+              <h2>${invoice.number}</h2>
+            </div>
+            <div class="invoice-details">
+              <p><strong>Cliente:</strong> ${customerName}</p>
+              <p><strong>Data:</strong> ${invoice.date}</p>
+              <p><strong>Scadenza:</strong> ${invoice.dueDate}</p>
+            </div>
+            <div class="totals">
+              <p>Subtotale: €${invoice.subtotal.toFixed(2)}</p>
+              <p>IVA: €${invoice.tax.toFixed(2)}</p>
+              <p><strong>TOTALE: €${invoice.total.toFixed(2)}</strong></p>
+            </div>
+            ${invoice.notes ? `<div><p><strong>Note:</strong> ${invoice.notes}</p></div>` : ''}
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+    }
+  };
+
+  if (isLoadingInvoices) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-64">
+          <div className="animate-pulse text-muted-foreground">Caricamento fatture...</div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -98,10 +204,32 @@ const InvoicesPage = () => {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">
-                      <Download className="h-4 w-4" />
-                      <span className="sr-only">Scarica</span>
-                    </Button>
+                    <div className="flex gap-1 justify-end">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleEditInvoice(invoice)}
+                        title="Modifica fattura"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handlePrintInvoice(invoice)}
+                        title="Stampa fattura"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleDownloadInvoice(invoice)}
+                        title="Scarica fattura"
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               );
@@ -129,6 +257,16 @@ const InvoicesPage = () => {
         </div>
         <Button variant="outline">Esporta fatture</Button>
       </div>
+
+      {/* Edit Invoice Dialog */}
+      {selectedInvoice && (
+        <EditInvoiceDialog
+          open={isEditDialogOpen}
+          onOpenChange={setIsEditDialogOpen}
+          invoice={selectedInvoice}
+          customers={customers}
+        />
+      )}
     </Layout>
   );
 };

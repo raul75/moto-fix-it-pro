@@ -31,11 +31,12 @@ export async function signUp(email: string, password: string, name: string, role
         user_id: authData.user.id,
         name: name,
         email: email,
-        phone: '',
+        phone: '', // Default empty phone
       }]);
     
     if (customerError) {
-      throw new Error(`Errore nella creazione del cliente: ${customerError.message}`);
+      console.error('Errore nella creazione del cliente:', customerError);
+      // Don't throw error here, just log it so registration can continue
     }
   }
   

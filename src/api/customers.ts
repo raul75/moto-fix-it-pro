@@ -92,3 +92,29 @@ export async function deleteCustomer(id: string): Promise<void> {
     throw new Error(error.message);
   }
 }
+
+// Get all invoices
+export async function getInvoices() {
+  const { data, error } = await supabase
+    .from('invoices')
+    .select('*')
+    .order('date', { ascending: false });
+  
+  if (error) {
+    throw new Error(error.message);
+  }
+  
+  return data.map((invoice: any) => ({
+    id: invoice.id,
+    repairId: invoice.repair_id,
+    customerId: invoice.customer_id,
+    number: invoice.number,
+    date: invoice.date,
+    dueDate: invoice.due_date,
+    subtotal: invoice.subtotal,
+    tax: invoice.tax,
+    total: invoice.total,
+    notes: invoice.notes,
+    status: invoice.status
+  }));
+}
