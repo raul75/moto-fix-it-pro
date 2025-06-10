@@ -1,535 +1,595 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
+import { it } from 'date-fns/locale';
 import Layout from '@/components/Layout';
-import StatusBadge from '@/components/StatusBadge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChevronLeft, Edit, Camera, Printer, Save, X } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { 
+  ArrowLeft, 
+  Edit, 
+  ImagePlus, 
+  Save, 
+  Loader2, 
+  CalendarClock,
+  Image,
+  Plus
+} from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
+import { Repair, RepairStatus, Photo } from '@/types';
 import { getRepairById, updateRepair, uploadPhotoToRepair } from '@/api/repairs';
-import { getCustomerById } from '@/api/customers';
-import { format } from 'date-fns';
-import { it, es, enUS } from 'date-fns/locale';
-import { useToast } from '@/hooks/use-toast';
+import { deletePhoto } from '@/api/photos';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { Label } from '@/components/ui/label';
+import { DatePicker } from "@/components/ui/date-picker";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import UsedPartsForm from '@/components/forms/UsedPartsForm';
 
 const RepairDetailsPage = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id: repairId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
+  
   const [isEditing, setIsEditing] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [editData, setEditData] = useState({
-    title: '',
-    description: '',
-    status: '',
-    laborHours: '',
-    laborRate: '',
-    notes: ''
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [status, setStatus] = useState<RepairStatus>('pending');
+  const [laborHours, setLaborHours] = useState<number | undefined>(undefined);
+  const [laborRate, setLaborRate] = useState<number | undefined>(undefined);
+  const [notes, setNotes] = useState('');
+  const [completionDate, setCompletionDate] = useState<Date | undefined>(undefined);
+  const [photoUploadDialogOpen, setPhotoUploadDialogOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [photoCaption, setPhotoCaption] = useState('');
+  const [showPartsForm, setShowPartsForm] = useState(false);
+
+  // Fetch repair data
+  const repairQuery = useQuery({
+    queryKey: ['repairs', repairId],
+    queryFn: () => getRepairById(repairId!),
+    enabled: !!repairId,
   });
   
-  // Get the appropriate locale for date formatting
-  const getDateLocale = () => {
-    switch (i18n.language) {
-      case 'it': return it;
-      case 'es': return es;
-      case 'en': return enUS;
-      default: return es;
+  // Pre-fill form when repair data is available
+  React.useEffect(() => {
+    if (repairQuery.data) {
+      const repair = repairQuery.data;
+      setTitle(repair.title);
+      setDescription(repair.description);
+      setStatus(repair.status);
+      setLaborHours(repair.laborHours);
+      setLaborRate(repair.laborRate);
+      setNotes(repair.notes || '');
+      setCompletionDate(repair.dateCompleted ? new Date(repair.dateCompleted) : undefined);
     }
-  };
+  }, [repairQuery.data]);
   
-  // Fetch repair details
-  const { data: repair, isLoading: repairLoading } = useQuery({
-    queryKey: ['repair', id],
-    queryFn: () => getRepairById(id!),
-    enabled: !!id
-  });
-
-  // Fetch customer details
-  const { data: customer } = useQuery({
-    queryKey: ['customer', repair?.customerId],
-    queryFn: () => getCustomerById(repair!.customerId),
-    enabled: !!repair?.customerId
-  });
-
   // Update repair mutation
   const updateRepairMutation = useMutation({
-    mutationFn: ({ id, updates }: { id: string, updates: any }) => updateRepair(id, updates),
-    onSuccess: (updatedRepair) => {
-      queryClient.invalidateQueries({ queryKey: ['repair', id] });
-      queryClient.invalidateQueries({ queryKey: ['invoices'] }); // Refresh invoices list
-      setIsEditing(false);
-      
-      // Show different messages based on status change
-      if (editData.status === 'completed' && updatedRepair.status === 'completed') {
-        toast({
-          title: t('repairs.repairCompleted'),
-          description: "La riparazione è stata completata e la fattura è stata generata automaticamente.",
-        });
-      } else {
-        toast({
-          title: t('repairs.repairUpdated'),
-          description: t('repairs.updateSuccess'),
-        });
-      }
-    },
-    onError: (error: any) => {
+    mutationFn: (updates: Partial<Repair>) => updateRepair(repairId!, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['repairs', repairId] });
       toast({
-        title: t('repairs.error'),
-        description: error.message || t('repairs.updateError'),
+        title: "Riparazione aggiornata",
+        description: "La riparazione è stata aggiornata con successo.",
+      });
+      setIsEditing(false);
+    },
+    onError: (error) => {
+      toast({
+        title: "Errore",
+        description: error instanceof Error ? error.message : "Si è verificato un errore",
         variant: "destructive"
       });
     }
   });
-
+  
   // Upload photo mutation
   const uploadPhotoMutation = useMutation({
-    mutationFn: ({ repairId, file }: { repairId: string, file: File }) => 
-      uploadPhotoToRepair(repairId, file),
+    mutationFn: () => uploadPhotoToRepair(repairId!, selectedFile!, photoCaption),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['repair', id] });
+      queryClient.invalidateQueries({ queryKey: ['repairs', repairId] });
       toast({
-        title: "Foto caricata",
-        description: "La foto è stata aggiunta con successo alla riparazione.",
+        title: "Foto aggiunta",
+        description: "La foto è stata aggiunta con successo.",
+      });
+      setPhotoUploadDialogOpen(false);
+      setSelectedFile(null);
+      setPhotoCaption('');
+    },
+    onError: (error) => {
+      toast({
+        title: "Errore",
+        description: error instanceof Error ? error.message : "Si è verificato un errore durante il caricamento della foto",
+        variant: "destructive"
+      });
+    }
+  });
+  
+  // Delete photo mutation
+  const deletePhotoMutation = useMutation({
+    mutationFn: (photoId: string) => deletePhoto(photoId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['repairs', repairId] });
+      toast({
+        title: "Foto eliminata",
+        description: "La foto è stata eliminata con successo.",
       });
     },
-    onError: (error: any) => {
+    onError: (error) => {
       toast({
-        title: t('repairs.error'),
-        description: error.message || "Errore durante il caricamento della foto",
+        title: "Errore",
+        description: error instanceof Error ? error.message : "Si è verificato un errore durante l'eliminazione della foto",
         variant: "destructive"
       });
     }
   });
 
-  React.useEffect(() => {
-    if (repair) {
-      setEditData({
-        title: repair.title,
-        description: repair.description,
-        status: repair.status,
-        laborHours: repair.laborHours?.toString() || '',
-        laborRate: repair.laborRate?.toString() || '',
-        notes: repair.notes || ''
-      });
-    }
-  }, [repair]);
-
-  const handleSave = () => {
-    if (!id) return;
-
-    const updates = {
-      title: editData.title,
-      description: editData.description,
-      status: editData.status as any,
-      laborHours: editData.laborHours ? parseFloat(editData.laborHours) : undefined,
-      laborRate: editData.laborRate ? parseFloat(editData.laborRate) : undefined,
-      notes: editData.notes || undefined
-    };
-
-    updateRepairMutation.mutate({ id, updates });
+  const handlePartsUpdate = () => {
+    repairQuery.refetch();
   };
-
-  const handlePhotoUpload = () => {
-    fileInputRef.current?.click();
+  
+  const handleSave = async () => {
+    updateRepairMutation.mutate({
+      title,
+      description,
+      status,
+      laborHours,
+      laborRate,
+      notes,
+      dateCompleted: completionDate?.toISOString()
+    });
   };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && id) {
-      uploadPhotoMutation.mutate({ repairId: id, file });
-    }
-    // Reset the input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+  
+  const handleCancel = () => {
+    setIsEditing(false);
+    // Reset form to original values
+    if (repairQuery.data) {
+      const repair = repairQuery.data;
+      setTitle(repair.title);
+      setDescription(repair.description);
+      setStatus(repair.status);
+      setLaborHours(repair.laborHours);
+      setLaborRate(repair.laborRate);
+      setNotes(repair.notes || '');
+      setCompletionDate(repair.dateCompleted ? new Date(repair.dateCompleted) : undefined);
     }
   };
-
-  const handlePrint = () => {
-    window.print();
+  
+  const handlePhotoUpload = async () => {
+    uploadPhotoMutation.mutate();
   };
-
-  if (repairLoading) {
+  
+  const handleDeletePhoto = (photoId: string) => {
+    if (window.confirm("Sei sicuro di voler eliminare questa foto?")) {
+      deletePhotoMutation.mutate(photoId);
+    }
+  };
+  
+  const repair = repairQuery.data;
+  
+  if (repairQuery.isLoading) {
     return (
       <Layout>
         <div className="flex items-center justify-center min-h-64">
-          <div className="animate-pulse text-muted-foreground">{t('common.loading')}</div>
-        </div>
-      </Layout>
-    );
-  }
-
-  if (!repair) {
-    return (
-      <Layout>
-        <div className="text-center py-16">
-          <h2 className="text-xl font-semibold">{t('repairs.notFound')}</h2>
-          <p className="mt-2 text-muted-foreground">
-            {t('repairs.notFoundDesc')}
-          </p>
-          <Button className="mt-6" onClick={() => navigate('/repairs')}>
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            {t('repairs.backToRepairs')}
-          </Button>
+          <div className="animate-pulse text-muted-foreground">Caricamento dettagli riparazione...</div>
         </div>
       </Layout>
     );
   }
   
-  // Calculate totals
-  const partsCost = repair.parts?.reduce((sum, part) => sum + (part.priceEach * part.quantity), 0) || 0;
-  const laborCost = (repair.laborHours || 0) * (repair.laborRate || 0);
-  const totalCost = partsCost + laborCost;
-
+  if (!repair || repairQuery.isError) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center min-h-64">
+          <div className="text-muted-foreground">Riparazione non trovata.</div>
+        </div>
+      </Layout>
+    );
+  }
+  
   return (
     <Layout>
-      {/* Hidden file input for photo upload */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        accept="image/*"
-        style={{ display: 'none' }}
-      />
-      
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={() => navigate('/repairs')}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          {isEditing ? (
-            <Input 
-              value={editData.title}
-              onChange={(e) => setEditData(prev => ({ ...prev, title: e.target.value }))}
-              className="text-2xl font-bold border-none p-0 h-auto bg-transparent"
-            />
-          ) : (
-            <h1 className="text-2xl font-bold">{repair.title}</h1>
-          )}
-          <StatusBadge status={repair.status} />
-        </div>
-        <div className="flex gap-2">
-          {isEditing ? (
-            <>
-              <Button variant="outline" onClick={() => setIsEditing(false)}>
-                <X className="h-4 w-4 mr-2" />
-                {t('repairs.cancel')}
-              </Button>
-              <Button onClick={handleSave} disabled={updateRepairMutation.isPending}>
-                <Save className="h-4 w-4 mr-2" />
-                {updateRepairMutation.isPending ? t('repairs.saving') : t('repairs.save')}
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button 
-                variant="outline" 
-                onClick={handlePhotoUpload}
-                disabled={uploadPhotoMutation.isPending}
-              >
-                <Camera className="h-4 w-4 mr-2" />
-                {uploadPhotoMutation.isPending ? 'Caricando...' : t('repairs.addPhoto')}
-              </Button>
-              <Button variant="outline" onClick={handlePrint}>
-                <Printer className="h-4 w-4 mr-2" />
-                {t('repairs.print')}
-              </Button>
-              <Button onClick={() => setIsEditing(true)}>
-                <Edit className="h-4 w-4 mr-2" />
-                {t('repairs.edit')}
-              </Button>
-            </>
-          )}
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('repairs.customerInfo')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {customer ? (
-              <div className="space-y-2">
-                <p className="font-semibold">{customer.name}</p>
-                <p className="text-sm">Email: {customer.email}</p>
-                <p className="text-sm">{t('auth.phone')}: {customer.phone}</p>
-                {customer.address && <p className="text-sm">{t('settings.business.address')}: {customer.address}</p>}
-              </div>
-            ) : (
-              <p className="text-muted-foreground">{t('common.loading')}</p>
-            )}
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('repairs.repairStatus')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {isEditing ? (
-                <Select value={editData.status} onValueChange={(value) => setEditData(prev => ({ ...prev, status: value }))}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">{t('repairs.status.pending')}</SelectItem>
-                    <SelectItem value="in-progress">{t('repairs.status.inProgress')}</SelectItem>
-                    <SelectItem value="completed">{t('repairs.status.completed')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              ) : (
-                <StatusBadge status={repair.status} />
-              )}
-              
-              <div className="flex justify-between">
-                <span className="text-sm">{t('repairs.creationDate')}:</span>
-                <span className="text-sm">{format(new Date(repair.dateCreated), 'dd MMMM yyyy', { locale: getDateLocale() })}</span>
-              </div>
-              
-              <div className="flex justify-between">
-                <span className="text-sm">{t('repairs.lastUpdate')}:</span>
-                <span className="text-sm">{format(new Date(repair.dateUpdated), 'dd MMMM yyyy', { locale: getDateLocale() })}</span>
-              </div>
-              
-              {repair.dateCompleted && (
-                <div className="flex justify-between">
-                  <span className="text-sm">{t('repairs.completionDate')}:</span>
-                  <span className="text-sm">{format(new Date(repair.dateCompleted), 'dd MMMM yyyy', { locale: getDateLocale() })}</span>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('repairs.costs')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <span className="text-sm">{t('repairs.parts')}:</span>
-                <span className="text-sm">€{partsCost.toFixed(2)}</span>
-              </div>
-              
-              <div className="flex justify-between">
-                <span className="text-sm">{t('repairs.labor')}:</span>
-                <span className="text-sm">€{laborCost.toFixed(2)}</span>
-              </div>
-              
-              <Separator className="my-2" />
-              
-              <div className="flex justify-between font-semibold">
-                <span>{t('repairs.total')}:</span>
-                <span>€{totalCost.toFixed(2)}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      
-      <Tabs defaultValue="details" className="mt-6">
-        <TabsList>
-          <TabsTrigger value="details">{t('repairs.details')}</TabsTrigger>
-          <TabsTrigger value="parts">{t('repairs.parts')}</TabsTrigger>
-          <TabsTrigger value="photos">{t('repairs.photos')}</TabsTrigger>
-          <TabsTrigger value="notes">{t('repairs.notes')}</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="details" className="mt-4 space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('repairs.description')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isEditing ? (
-                <Textarea 
-                  value={editData.description}
-                  onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
-                  rows={4}
-                />
-              ) : (
-                <p>{repair.description}</p>
-              )}
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('repairs.labor')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {isEditing ? (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm text-muted-foreground">{t('repairs.laborHours')}</label>
-                      <Input 
-                        type="number"
-                        value={editData.laborHours}
-                        onChange={(e) => setEditData(prev => ({ ...prev, laborHours: e.target.value }))}
-                        placeholder="0"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm text-muted-foreground">{t('repairs.hourlyRate')} (€)</label>
-                      <Input 
-                        type="number"
-                        value={editData.laborRate}
-                        onChange={(e) => setEditData(prev => ({ ...prev, laborRate: e.target.value }))}
-                        placeholder="0.00"
-                      />
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                repair.laborHours ? (
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground">{t('repairs.laborHours')}</p>
-                        <p className="font-medium">{repair.laborHours}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">{t('repairs.hourlyRate')}</p>
-                        <p className="font-medium">€{repair.laborRate}/ora</p>
-                      </div>
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div className="flex justify-between">
-                      <p className="font-medium">{t('repairs.totalLabor')}</p>
-                      <p className="font-medium">€{laborCost.toFixed(2)}</p>
-                    </div>
-                  </div>
+      <div className="flex items-center gap-2 mb-6">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="h-8 w-8 p-0" 
+          onClick={() => navigate('/repairs')}
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <h1 className="text-2xl font-bold">
+          {isEditing ? 'Modifica Riparazione' : 'Dettagli Riparazione'}
+        </h1>
+        {repair.status !== 'completed' && (
+          <Button 
+            size="sm" 
+            onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+            disabled={updateRepairMutation.isPending}
+          >
+            {isEditing ? (
+              <>
+                {updateRepairMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Salvataggio...
+                  </>
                 ) : (
-                  <p className="text-muted-foreground">{t('repairs.noLaborRecorded')}</p>
-                )
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="parts" className="mt-4">
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Salva
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                <Edit className="mr-2 h-4 w-4" />
+                Modifica
+              </>
+            )}
+          </Button>
+        )}
+        {isEditing && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleCancel}
+            disabled={updateRepairMutation.isPending}
+          >
+            Annulla
+          </Button>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>{t('repairs.usedParts')}</CardTitle>
+              <CardTitle>Informazioni Riparazione</CardTitle>
+              <CardDescription>
+                Dettagli sulla riparazione e sullo stato di avanzamento.
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              {repair.parts && repair.parts.length > 0 ? (
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>{t('repairs.partName')}</TableHead>
-                        <TableHead className="text-right">{t('repairs.quantity')}</TableHead>
-                        <TableHead className="text-right">{t('repairs.unitPrice')}</TableHead>
-                        <TableHead className="text-right">{t('repairs.total')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {repair.parts.map(part => (
-                        <TableRow key={part.id}>
-                          <TableCell>{part.partName}</TableCell>
-                          <TableCell className="text-right">{part.quantity}</TableCell>
-                          <TableCell className="text-right">€{part.priceEach.toFixed(2)}</TableCell>
-                          <TableCell className="text-right">€{(part.quantity * part.priceEach).toFixed(2)}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                  
-                  <div className="mt-4 flex justify-between">
-                    <p className="font-medium">{t('repairs.totalParts')}</p>
-                    <p className="font-medium">€{partsCost.toFixed(2)}</p>
-                  </div>
+                  <Label htmlFor="title">Titolo</Label>
+                  {isEditing ? (
+                    <Input 
+                      id="title" 
+                      value={title} 
+                      onChange={(e) => setTitle(e.target.value)} 
+                      disabled={updateRepairMutation.isPending}
+                    />
+                  ) : (
+                    <p className="font-semibold">{repair.title}</p>
+                  )}
                 </div>
-              ) : (
-                <p className="text-muted-foreground">{t('repairs.noPartsUsed')}</p>
+                <div>
+                  <Label htmlFor="status">Stato</Label>
+                  {isEditing ? (
+                    <Select 
+                      value={status} 
+                      onValueChange={(value) => setStatus(value as RepairStatus)}
+                      disabled={updateRepairMutation.isPending}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleziona uno stato" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pending">In Attesa</SelectItem>
+                        <SelectItem value="in-progress">In Corso</SelectItem>
+                        <SelectItem value="completed">Completata</SelectItem>
+                        <SelectItem value="cancelled">Annullata</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Badge 
+                      variant="secondary"
+                      className={
+                        status === 'pending' ? 'bg-amber-100 text-amber-800 hover:bg-amber-200' :
+                        status === 'in-progress' ? 'bg-blue-100 text-blue-800 hover:bg-blue-200' :
+                        status === 'completed' ? 'bg-green-100 text-green-800 hover:bg-green-200' :
+                        'bg-red-100 text-red-800 hover:bg-red-200'
+                      }
+                    >
+                      {status}
+                    </Badge>
+                  )}
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="description">Descrizione</Label>
+                {isEditing ? (
+                  <Textarea 
+                    id="description" 
+                    value={description} 
+                    onChange={(e) => setDescription(e.target.value)} 
+                    className="resize-none"
+                    disabled={updateRepairMutation.isPending}
+                  />
+                ) : (
+                  <p className="font-semibold">{repair.description}</p>
+                )}
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="laborHours">Ore di Lavoro</Label>
+                  {isEditing ? (
+                    <Input 
+                      type="number"
+                      id="laborHours" 
+                      value={laborHours || ''} 
+                      onChange={(e) => setLaborHours(parseFloat(e.target.value) || undefined)} 
+                      disabled={updateRepairMutation.isPending}
+                    />
+                  ) : (
+                    <p className="font-semibold">{repair.laborHours || 'N/A'}</p>
+                  )}
+                </div>
+                <div>
+                  <Label htmlFor="laborRate">Tariffa Oraria</Label>
+                  {isEditing ? (
+                    <Input 
+                      type="number"
+                      id="laborRate" 
+                      value={laborRate || ''} 
+                      onChange={(e) => setLaborRate(parseFloat(e.target.value) || undefined)} 
+                      disabled={updateRepairMutation.isPending}
+                    />
+                  ) : (
+                    <p className="font-semibold">{repair.laborRate ? `€${repair.laborRate.toFixed(2)}` : 'N/A'}</p>
+                  )}
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="notes">Note</Label>
+                {isEditing ? (
+                  <Textarea 
+                    id="notes" 
+                    value={notes} 
+                    onChange={(e) => setNotes(e.target.value)} 
+                    className="resize-none"
+                    disabled={updateRepairMutation.isPending}
+                  />
+                ) : (
+                  <p className="font-semibold">{repair.notes || 'N/A'}</p>
+                )}
+              </div>
+              
+              <div>
+                <Label htmlFor="completionDate">Data di Completamento</Label>
+                {isEditing ? (
+                  <DatePicker
+                    id="completionDate"
+                    value={completionDate}
+                    onValueChange={setCompletionDate}
+                    locale={it}
+                    disabled={updateRepairMutation.isPending}
+                  />
+                ) : (
+                  <p className="font-semibold">
+                    {repair.dateCompleted ? format(new Date(repair.dateCompleted), 'dd MMMM yyyy', { locale: it }) : 'N/A'}
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <CardTitle>Ricambi e Materiali</CardTitle>
+                {repair?.status !== 'completed' && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowPartsForm(!showPartsForm)}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Aggiungi Ricambio
+                  </Button>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              {showPartsForm && repair?.status !== 'completed' && (
+                <div className="mb-6">
+                  <UsedPartsForm
+                    repairId={repairId!}
+                    parts={repair?.parts || []}
+                    onPartsUpdate={handlePartsUpdate}
+                    isLoading={updateRepairMutation.isPending}
+                  />
+                </div>
+              )}
+              
+              {!showPartsForm && (
+                <>
+                  {repair?.parts && repair.parts.length > 0 ? (
+                    <div className="space-y-4">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Ricambio</TableHead>
+                            <TableHead className="text-right">Quantità</TableHead>
+                            <TableHead className="text-right">Prezzo Unitario</TableHead>
+                            <TableHead className="text-right">Totale</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {repair.parts.map(part => (
+                            <TableRow key={part.id}>
+                              <TableCell>{part.partName}</TableCell>
+                              <TableCell className="text-right">{part.quantity}</TableCell>
+                              <TableCell className="text-right">€{part.priceEach.toFixed(2)}</TableCell>
+                              <TableCell className="text-right">€{(part.quantity * part.priceEach).toFixed(2)}</TableCell>
+                            </TableRow>
+                          ))}
+                          <TableRow className="bg-muted/50">
+                            <TableCell colSpan={3} className="font-medium">Totale Ricambi</TableCell>
+                            <TableCell className="text-right font-medium">
+                              €{repair.parts.reduce((sum, part) => sum + (part.quantity * part.priceEach), 0).toFixed(2)}
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </div>
+                  ) : (
+                    <p className="text-muted-foreground">Nessun ricambio utilizzato</p>
+                  )}
+                </>
               )}
             </CardContent>
           </Card>
-        </TabsContent>
-        
-        <TabsContent value="photos" className="mt-4">
+
           <Card>
             <CardHeader>
-              <CardTitle>{t('repairs.photoDocumentation')}</CardTitle>
+              <div className="flex justify-between items-center">
+                <CardTitle>Foto</CardTitle>
+                {repair.status !== 'completed' && (
+                  <Button variant="outline" size="sm" onClick={() => setPhotoUploadDialogOpen(true)}>
+                    <ImagePlus className="h-4 w-4 mr-2" />
+                    Aggiungi Foto
+                  </Button>
+                )}
+              </div>
             </CardHeader>
-            <CardContent>
-              {repair.photos && repair.photos.length > 0 ? (
+            <CardContent className="space-y-4">
+              {repair.photos.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {repair.photos.map(photo => (
-                    <div key={photo.id} className="overflow-hidden rounded-lg border">
-                      <div className="aspect-square relative">
-                        <img 
-                          src={photo.url}
-                          alt={photo.caption || 'Foto riparazione'}
-                          className="w-full h-full object-cover"
-                        />
+                    <div key={photo.id} className="relative">
+                      <img src={photo.url} alt={photo.caption || 'Foto riparazione'} className="rounded-md aspect-video object-cover w-full" />
+                      <div className="absolute top-2 right-2 flex gap-1">
+                        {repair.status !== 'completed' && (
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                            onClick={() => handleDeletePhoto(photo.id)}
+                          >
+                            <Image className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                       {photo.caption && (
-                        <div className="p-2">
-                          <p className="text-sm">{photo.caption}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {new Date(photo.dateAdded).toLocaleDateString(i18n.language)}
-                          </p>
+                        <div className="absolute bottom-0 left-0 w-full bg-black/50 text-white p-2 rounded-b-md">
+                          {photo.caption}
                         </div>
                       )}
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <Camera className="mx-auto h-12 w-12 text-muted-foreground opacity-20" />
-                  <p className="mt-4 text-muted-foreground">
-                    {t('repairs.noPhotos')}
-                  </p>
-                  <Button className="mt-4" onClick={handlePhotoUpload}>
-                    <Camera className="mr-2 h-4 w-4" />
-                    {t('repairs.addPhoto')}
-                  </Button>
-                </div>
+                <p className="text-muted-foreground">Nessuna foto presente</p>
               )}
             </CardContent>
           </Card>
-        </TabsContent>
-        
-        <TabsContent value="notes" className="mt-4">
+        </div>
+
+        <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>{t('repairs.notes')}</CardTitle>
+              <CardTitle>Informazioni Cliente</CardTitle>
+              <CardDescription>
+                Dettagli sul cliente e sulla moto.
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              {isEditing ? (
-                <Textarea 
-                  value={editData.notes}
-                  onChange={(e) => setEditData(prev => ({ ...prev, notes: e.target.value }))}
-                  placeholder={t('repairs.addNotes')}
-                  rows={6}
-                />
-              ) : (
-                repair.notes ? (
-                  <p>{repair.notes}</p>
-                ) : (
-                  <p className="text-muted-foreground">{t('repairs.noNotes')}</p>
-                )
-              )}
+            <CardContent className="space-y-4">
+              <div>
+                <Label>Cliente</Label>
+                <p className="font-semibold">{repair.customerId}</p>
+              </div>
+              <div>
+                <Label>Moto</Label>
+                <p className="font-semibold">{repair.motorcycleId}</p>
+              </div>
+              <div>
+                <Label>Creato il</Label>
+                <p className="font-semibold">
+                  {format(new Date(repair.dateCreated), 'dd MMMM yyyy', { locale: it })}
+                </p>
+              </div>
+              <div>
+                <Label>Ultimo aggiornamento</Label>
+                <p className="font-semibold">
+                  {format(new Date(repair.dateUpdated), 'dd MMMM yyyy', { locale: it })}
+                </p>
+              </div>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
+
+      {/* Photo Upload Dialog */}
+      <Dialog open={photoUploadDialogOpen} onOpenChange={setPhotoUploadDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Carica Foto</DialogTitle>
+            <DialogDescription>
+              Aggiungi una foto alla riparazione.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="photo" className="text-right">
+                Foto
+              </Label>
+              <Input 
+                type="file" 
+                id="photo" 
+                className="col-span-3" 
+                onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="caption" className="text-right">
+                Caption
+              </Label>
+              <Input 
+                type="text" 
+                id="caption" 
+                className="col-span-3" 
+                value={photoCaption}
+                onChange={(e) => setPhotoCaption(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setPhotoUploadDialogOpen(false)}>
+              Annulla
+            </Button>
+            <Button type="submit" onClick={handlePhotoUpload} disabled={uploadPhotoMutation.isPending}>
+              {uploadPhotoMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Caricamento...
+                </>
+              ) : (
+                "Carica"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
