@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -10,20 +11,22 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { 
   ArrowLeft, 
   Edit, 
   ImagePlus, 
   Save, 
   Loader2, 
-  CalendarClock,
+  CalendarIcon,
   Image,
-  Plus
+  Plus,
+  Trash2
 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Repair, RepairStatus, Photo } from '@/types';
 import { getRepairById, updateRepair, uploadPhotoToRepair } from '@/api/repairs';
-import { deletePhoto } from '@/api/photos';
 import {
   Dialog,
   DialogContent,
@@ -33,9 +36,9 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
-import { DatePicker } from "@/components/ui/date-picker";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import UsedPartsForm from '@/components/forms/UsedPartsForm';
+import { cn } from "@/lib/utils";
 
 const RepairDetailsPage = () => {
   const { id: repairId } = useParams();
@@ -118,25 +121,6 @@ const RepairDetailsPage = () => {
       });
     }
   });
-  
-  // Delete photo mutation
-  const deletePhotoMutation = useMutation({
-    mutationFn: (photoId: string) => deletePhoto(photoId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['repairs', repairId] });
-      toast({
-        title: "Foto eliminata",
-        description: "La foto è stata eliminata con successo.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Errore",
-        description: error instanceof Error ? error.message : "Si è verificato un errore durante l'eliminazione della foto",
-        variant: "destructive"
-      });
-    }
-  });
 
   const handlePartsUpdate = () => {
     repairQuery.refetch();
@@ -171,12 +155,6 @@ const RepairDetailsPage = () => {
   
   const handlePhotoUpload = async () => {
     uploadPhotoMutation.mutate();
-  };
-  
-  const handleDeletePhoto = (photoId: string) => {
-    if (window.confirm("Sei sicuro di voler eliminare questa foto?")) {
-      deletePhotoMutation.mutate(photoId);
-    }
   };
   
   const repair = repairQuery.data;
@@ -377,13 +355,29 @@ const RepairDetailsPage = () => {
               <div>
                 <Label htmlFor="completionDate">Data di Completamento</Label>
                 {isEditing ? (
-                  <DatePicker
-                    id="completionDate"
-                    value={completionDate}
-                    onValueChange={setCompletionDate}
-                    locale={it}
-                    disabled={updateRepairMutation.isPending}
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !completionDate && "text-muted-foreground"
+                        )}
+                        disabled={updateRepairMutation.isPending}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {completionDate ? format(completionDate, "PPP", { locale: it }) : <span>Seleziona una data</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={completionDate}
+                        onSelect={setCompletionDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                 ) : (
                   <p className="font-semibold">
                     {repair.dateCompleted ? format(new Date(repair.dateCompleted), 'dd MMMM yyyy', { locale: it }) : 'N/A'}
@@ -478,18 +472,6 @@ const RepairDetailsPage = () => {
                   {repair.photos.map(photo => (
                     <div key={photo.id} className="relative">
                       <img src={photo.url} alt={photo.caption || 'Foto riparazione'} className="rounded-md aspect-video object-cover w-full" />
-                      <div className="absolute top-2 right-2 flex gap-1">
-                        {repair.status !== 'completed' && (
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-                            onClick={() => handleDeletePhoto(photo.id)}
-                          >
-                            <Image className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
                       {photo.caption && (
                         <div className="absolute bottom-0 left-0 w-full bg-black/50 text-white p-2 rounded-b-md">
                           {photo.caption}
