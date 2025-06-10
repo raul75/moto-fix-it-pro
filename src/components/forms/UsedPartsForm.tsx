@@ -10,15 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { getInventoryParts, InventoryPart } from '@/api/inventory';
-
-type UsedPart = {
-  id: string;
-  partId: string;
-  partName: string;
-  quantity: number;
-  unitPrice: number;
-};
+import { getInventoryParts } from '@/api/inventory';
+import { InventoryPart, UsedPart } from '@/types';
 
 type UsedPartsFormProps = {
   repairId: string;
@@ -48,7 +41,7 @@ const UsedPartsForm = ({ repairId, usedParts, onUpdate }: UsedPartsFormProps) =>
       if (!part) throw new Error('Part not found');
       if (part.quantity < quantity) throw new Error(t('repairs.insufficientStock'));
       
-      return { partId, quantity, unitPrice: part.price };
+      return { partId, quantity, priceEach: part.price };
     },
     onSuccess: () => {
       toast({
@@ -98,7 +91,7 @@ const UsedPartsForm = ({ repairId, usedParts, onUpdate }: UsedPartsFormProps) =>
     removePartMutation.mutate(partId);
   };
 
-  const totalPartsValue = usedParts.reduce((sum, part) => sum + (part.quantity * part.unitPrice), 0);
+  const totalPartsValue = usedParts.reduce((sum, part) => sum + (part.quantity * part.priceEach), 0);
 
   return (
     <Card>
@@ -172,8 +165,8 @@ const UsedPartsForm = ({ repairId, usedParts, onUpdate }: UsedPartsFormProps) =>
                   <TableRow key={part.id}>
                     <TableCell>{part.partName}</TableCell>
                     <TableCell>{part.quantity}</TableCell>
-                    <TableCell>€{part.unitPrice.toFixed(2)}</TableCell>
-                    <TableCell>€{(part.quantity * part.unitPrice).toFixed(2)}</TableCell>
+                    <TableCell>€{part.priceEach.toFixed(2)}</TableCell>
+                    <TableCell>€{(part.quantity * part.priceEach).toFixed(2)}</TableCell>
                     <TableCell>
                       <Button
                         variant="ghost"
