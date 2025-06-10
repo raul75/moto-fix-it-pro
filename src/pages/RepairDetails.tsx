@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -408,9 +407,8 @@ const RepairDetailsPage = () => {
                 <div className="mb-6">
                   <UsedPartsForm
                     repairId={repairId!}
-                    parts={repair?.parts || []}
-                    onPartsUpdate={handlePartsUpdate}
-                    isLoading={updateRepairMutation.isPending}
+                    usedParts={repair?.parts || []}
+                    onUpdate={handlePartsUpdate}
                   />
                 </div>
               )}

@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { getInventoryItems } from '@/api/inventory';
+import { getInventoryParts, InventoryPart } from '@/api/inventory';
 
 type UsedPart = {
   id: string;
@@ -37,14 +37,14 @@ const UsedPartsForm = ({ repairId, usedParts, onUpdate }: UsedPartsFormProps) =>
   // Fetch inventory items
   const { data: inventoryItems = [] } = useQuery({
     queryKey: ['inventory'],
-    queryFn: getInventoryItems,
+    queryFn: getInventoryParts,
   });
 
   // Mock mutations - replace with actual API calls
   const addPartMutation = useMutation({
     mutationFn: async ({ partId, quantity }: { partId: string; quantity: number }) => {
       // Mock API call - replace with actual implementation
-      const part = inventoryItems.find(item => item.id === partId);
+      const part = inventoryItems.find((item: InventoryPart) => item.id === partId);
       if (!part) throw new Error('Part not found');
       if (part.quantity < quantity) throw new Error(t('repairs.insufficientStock'));
       
@@ -117,7 +117,7 @@ const UsedPartsForm = ({ repairId, usedParts, onUpdate }: UsedPartsFormProps) =>
                   <SelectValue placeholder={t('repairs.selectPart')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {inventoryItems.map((item) => (
+                  {inventoryItems.map((item: InventoryPart) => (
                     <SelectItem key={item.id} value={item.id}>
                       {item.name} - €{item.price} ({item.quantity} {t('inventory.inStock')})
                     </SelectItem>

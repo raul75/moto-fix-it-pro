@@ -50,8 +50,10 @@ const EditCustomerForm = ({ customer, onSubmit, onCancel, isLoading = false }: E
         <Input
           id="name"
           {...register('name')}
-          error={errors.name?.message}
         />
+        {errors.name && (
+          <p className="text-sm text-red-600">{errors.name.message}</p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -60,8 +62,10 @@ const EditCustomerForm = ({ customer, onSubmit, onCancel, isLoading = false }: E
           id="email"
           type="email"
           {...register('email')}
-          error={errors.email?.message}
         />
+        {errors.email && (
+          <p className="text-sm text-red-600">{errors.email.message}</p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -69,8 +73,10 @@ const EditCustomerForm = ({ customer, onSubmit, onCancel, isLoading = false }: E
         <Input
           id="phone"
           {...register('phone')}
-          error={errors.phone?.message}
         />
+        {errors.phone && (
+          <p className="text-sm text-red-600">{errors.phone.message}</p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -78,8 +84,10 @@ const EditCustomerForm = ({ customer, onSubmit, onCancel, isLoading = false }: E
         <Input
           id="address"
           {...register('address')}
-          error={errors.address?.message}
         />
+        {errors.address && (
+          <p className="text-sm text-red-600">{errors.address.message}</p>
+        )}
       </div>
 
       <div className="flex justify-end gap-2 pt-4">
