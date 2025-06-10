@@ -1,35 +1,23 @@
 
 import React from 'react';
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from '@/components/ui/input';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import { Customer } from '@/types';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
+import { Customer } from '@/types';
 
-const editCustomerFormSchema = z.object({
-  name: z.string().min(2, {
-    message: "Il nome deve essere di almeno 2 caratteri",
-  }),
-  email: z.string().email({
-    message: "Inserisci un indirizzo email valido",
-  }),
-  phone: z.string().min(8, {
-    message: "Il numero di telefono deve essere di almeno 8 caratteri",
-  }),
+const editCustomerSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email address'),
+  phone: z.string().min(1, 'Phone is required'),
   address: z.string().optional(),
 });
 
-export type EditCustomerFormValues = z.infer<typeof editCustomerFormSchema>;
+export type EditCustomerFormValues = z.infer<typeof editCustomerSchema>;
 
 type EditCustomerFormProps = {
   customer: Customer;
@@ -39,100 +27,77 @@ type EditCustomerFormProps = {
 };
 
 const EditCustomerForm = ({ customer, onSubmit, onCancel, isLoading = false }: EditCustomerFormProps) => {
-  const form = useForm<EditCustomerFormValues>({
-    resolver: zodResolver(editCustomerFormSchema),
+  const { t } = useTranslation();
+  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<EditCustomerFormValues>({
+    resolver: zodResolver(editCustomerSchema),
     defaultValues: {
       name: customer.name,
       email: customer.email,
       phone: customer.phone,
-      address: customer.address || "",
+      address: customer.address || '',
     },
   });
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nome</FormLabel>
-              <FormControl>
-                <Input placeholder="Nome del cliente" {...field} disabled={isLoading} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="name">{t('customers.name')} *</Label>
+        <Input
+          id="name"
+          {...register('name')}
+          error={errors.name?.message}
         />
-        
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input type="email" placeholder="cliente@esempio.com" {...field} disabled={isLoading} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="email">{t('customers.email')} *</Label>
+        <Input
+          id="email"
+          type="email"
+          {...register('email')}
+          error={errors.email?.message}
         />
-        
-        <FormField
-          control={form.control}
-          name="phone"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Telefono</FormLabel>
-              <FormControl>
-                <Input placeholder="+39 123 456 7890" {...field} disabled={isLoading} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="phone">{t('customers.phone')} *</Label>
+        <Input
+          id="phone"
+          {...register('phone')}
+          error={errors.phone?.message}
         />
-        
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Indirizzo</FormLabel>
-              <FormControl>
-                <Input placeholder="Via, Città, CAP (opzionale)" {...field} disabled={isLoading} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="address">{t('customers.address')}</Label>
+        <Input
+          id="address"
+          {...register('address')}
+          error={errors.address?.message}
         />
-        
-        <div className="flex justify-end gap-2">
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={onCancel}
-            disabled={isLoading}
-          >
-            Annulla
-          </Button>
-          <Button 
-            type="submit"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Salvataggio...
-              </>
-            ) : (
-              "Salva Modifiche"
-            )}
-          </Button>
-        </div>
-      </form>
-    </Form>
+      </div>
+
+      <div className="flex justify-end gap-2 pt-4">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          {t('common.cancel')}
+        </Button>
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              {t('customers.saving')}
+            </>
+          ) : (
+            t('common.save')
+          )}
+        </Button>
+      </div>
+    </form>
   );
 };
 

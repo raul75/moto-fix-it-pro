@@ -1,175 +1,206 @@
 
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, Trash2 } from 'lucide-react';
-import { getInventoryParts } from '@/api/inventory';
-import { addPartToRepair } from '@/api/repairs';
 import { useToast } from '@/hooks/use-toast';
-import { InventoryPart, UsedPart } from '@/types';
+import { getInventoryItems } from '@/api/inventory';
+
+type UsedPart = {
+  id: string;
+  partId: string;
+  partName: string;
+  quantity: number;
+  unitPrice: number;
+};
 
 type UsedPartsFormProps = {
   repairId: string;
-  parts: UsedPart[];
-  onPartsUpdate: () => void;
-  isLoading?: boolean;
+  usedParts: UsedPart[];
+  onUpdate: () => void;
 };
 
-const UsedPartsForm = ({ repairId, parts, onPartsUpdate, isLoading = false }: UsedPartsFormProps) => {
+const UsedPartsForm = ({ repairId, usedParts, onUpdate }: UsedPartsFormProps) => {
+  const { t } = useTranslation();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
   const [selectedPartId, setSelectedPartId] = useState<string>('');
   const [quantity, setQuantity] = useState<number>(1);
-  const [customPrice, setCustomPrice] = useState<number | null>(null);
-  const { toast } = useToast();
 
-  const { data: inventoryParts = [] } = useQuery({
-    queryKey: ['inventory-parts'],
-    queryFn: getInventoryParts
+  // Fetch inventory items
+  const { data: inventoryItems = [] } = useQuery({
+    queryKey: ['inventory'],
+    queryFn: getInventoryItems,
   });
 
-  const selectedPart = inventoryParts.find(p => p.id === selectedPartId);
-
-  const handleAddPart = async () => {
-    if (!selectedPart) {
-      toast({
-        title: "Errore",
-        description: "Seleziona un ricambio dall'inventario",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (quantity <= 0) {
-      toast({
-        title: "Errore", 
-        description: "La quantità deve essere maggiore di 0",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      const priceToUse = customPrice !== null ? customPrice : selectedPart.price;
+  // Mock mutations - replace with actual API calls
+  const addPartMutation = useMutation({
+    mutationFn: async ({ partId, quantity }: { partId: string; quantity: number }) => {
+      // Mock API call - replace with actual implementation
+      const part = inventoryItems.find(item => item.id === partId);
+      if (!part) throw new Error('Part not found');
+      if (part.quantity < quantity) throw new Error(t('repairs.insufficientStock'));
       
-      await addPartToRepair(
-        repairId,
-        selectedPart.id,
-        selectedPart.name,
-        quantity,
-        priceToUse
-      );
-
+      return { partId, quantity, unitPrice: part.price };
+    },
+    onSuccess: () => {
       toast({
-        title: "Ricambio aggiunto",
-        description: `${selectedPart.name} aggiunto alla riparazione`,
+        title: t('repairs.partAdded'),
+        description: t('repairs.partAddedSuccess'),
       });
-
-      // Reset form
       setSelectedPartId('');
       setQuantity(1);
-      setCustomPrice(null);
-      onPartsUpdate();
-    } catch (error) {
+      onUpdate();
+    },
+    onError: (error) => {
       toast({
-        title: "Errore",
-        description: error instanceof Error ? error.message : "Errore durante l'aggiunta del ricambio",
-        variant: "destructive"
+        title: t('common.error'),
+        description: error instanceof Error ? error.message : t('repairs.partError'),
+        variant: 'destructive',
       });
-    }
+    },
+  });
+
+  const removePartMutation = useMutation({
+    mutationFn: async (partId: string) => {
+      // Mock API call - replace with actual implementation
+      return { partId };
+    },
+    onSuccess: () => {
+      toast({
+        title: t('repairs.partRemoved'),
+        description: t('repairs.partRemovedSuccess'),
+      });
+      onUpdate();
+    },
+    onError: (error) => {
+      toast({
+        title: t('common.error'),
+        description: error instanceof Error ? error.message : t('repairs.partError'),
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const handleAddPart = () => {
+    if (!selectedPartId || quantity <= 0) return;
+    addPartMutation.mutate({ partId: selectedPartId, quantity });
   };
 
-  return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Ricambi Utilizzati</h3>
-      
-      {/* Add new part form */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border rounded-lg">
-        <div>
-          <label className="text-sm font-medium">Ricambio</label>
-          <Select value={selectedPartId} onValueChange={setSelectedPartId} disabled={isLoading}>
-            <SelectTrigger>
-              <SelectValue placeholder="Seleziona ricambio" />
-            </SelectTrigger>
-            <SelectContent>
-              {inventoryParts.map(part => (
-                <SelectItem key={part.id} value={part.id}>
-                  {part.name} - €{part.price.toFixed(2)} (Disp: {part.quantity})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div>
-          <label className="text-sm font-medium">Quantità</label>
-          <Input
-            type="number"
-            min="1"
-            value={quantity}
-            onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-            disabled={isLoading}
-          />
-        </div>
-        
-        <div>
-          <label className="text-sm font-medium">Prezzo personalizzato (€)</label>
-          <Input
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder={selectedPart ? selectedPart.price.toFixed(2) : "0.00"}
-            value={customPrice || ''}
-            onChange={(e) => setCustomPrice(e.target.value ? parseFloat(e.target.value) : null)}
-            disabled={isLoading}
-          />
-        </div>
-        
-        <div className="flex items-end">
-          <Button 
-            onClick={handleAddPart} 
-            disabled={!selectedPartId || isLoading}
-            className="w-full"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Aggiungi
-          </Button>
-        </div>
-      </div>
+  const handleRemovePart = (partId: string) => {
+    removePartMutation.mutate(partId);
+  };
 
-      {/* Parts table */}
-      {parts.length > 0 && (
-        <div className="border rounded-lg">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Ricambio</TableHead>
-                <TableHead className="text-right">Quantità</TableHead>
-                <TableHead className="text-right">Prezzo Unitario</TableHead>
-                <TableHead className="text-right">Totale</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {parts.map(part => (
-                <TableRow key={part.id}>
-                  <TableCell>{part.partName}</TableCell>
-                  <TableCell className="text-right">{part.quantity}</TableCell>
-                  <TableCell className="text-right">€{part.priceEach.toFixed(2)}</TableCell>
-                  <TableCell className="text-right">€{(part.quantity * part.priceEach).toFixed(2)}</TableCell>
-                </TableRow>
-              ))}
-              <TableRow className="bg-muted/50">
-                <TableCell colSpan={3} className="font-medium">Totale Ricambi</TableCell>
-                <TableCell className="text-right font-medium">
-                  €{parts.reduce((sum, part) => sum + (part.quantity * part.priceEach), 0).toFixed(2)}
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+  const totalPartsValue = usedParts.reduce((sum, part) => sum + (part.quantity * part.unitPrice), 0);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{t('repairs.manageParts')}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Add Parts Section */}
+        <div className="space-y-4 p-4 border rounded-lg">
+          <h4 className="font-medium">{t('repairs.addParts')}</h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label>{t('repairs.selectPart')}</Label>
+              <Select value={selectedPartId} onValueChange={setSelectedPartId}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t('repairs.selectPart')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {inventoryItems.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.name} - €{item.price} ({item.quantity} {t('inventory.inStock')})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>{t('repairs.quantityUsed')}</Label>
+              <Input
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+              />
+            </div>
+            
+            <div className="flex items-end">
+              <Button 
+                onClick={handleAddPart}
+                disabled={!selectedPartId || quantity <= 0 || addPartMutation.isPending}
+                className="w-full"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                {t('repairs.addSelectedPart')}
+              </Button>
+            </div>
+          </div>
         </div>
-      )}
-    </div>
+
+        {/* Used Parts Table */}
+        <div>
+          <h4 className="font-medium mb-3">{t('repairs.usedParts')}</h4>
+          {usedParts.length === 0 ? (
+            <p className="text-muted-foreground text-center py-4">
+              {t('repairs.noPartsUsed')}
+            </p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('repairs.partName')}</TableHead>
+                  <TableHead>{t('repairs.quantity')}</TableHead>
+                  <TableHead>{t('repairs.unitPrice')}</TableHead>
+                  <TableHead>{t('repairs.total')}</TableHead>
+                  <TableHead>{t('common.actions')}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {usedParts.map((part) => (
+                  <TableRow key={part.id}>
+                    <TableCell>{part.partName}</TableCell>
+                    <TableCell>{part.quantity}</TableCell>
+                    <TableCell>€{part.unitPrice.toFixed(2)}</TableCell>
+                    <TableCell>€{(part.quantity * part.unitPrice).toFixed(2)}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemovePart(part.partId)}
+                        disabled={removePartMutation.isPending}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                <TableRow>
+                  <TableCell colSpan={3} className="font-medium">
+                    {t('repairs.totalParts')}
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    €{totalPartsValue.toFixed(2)}
+                  </TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

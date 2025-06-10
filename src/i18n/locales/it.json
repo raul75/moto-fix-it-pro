@@ -178,7 +178,17 @@
     "phone": "Telefono",
     "address": "Indirizzo",
     "saving": "Salvando...",
-    "loadingCustomers": "Caricamento clienti..."
+    "loadingCustomers": "Caricamento clienti...",
+    "editCustomer": "Modifica Cliente",
+    "editCustomerDescription": "Modifica i dettagli del cliente selezionato.",
+    "customerUpdated": "Cliente aggiornato",
+    "customerUpdatedSuccess": "Il cliente è stato aggiornato con successo.",
+    "deleteCustomer": "Elimina Cliente",
+    "deleteCustomerConfirm": "Sei sicuro di voler eliminare questo cliente? Questa azione non può essere annullata.",
+    "customerDeleted": "Cliente eliminato",
+    "customerDeletedSuccess": "Il cliente è stato eliminato con successo.",
+    "updateError": "Errore durante l'aggiornamento del cliente",
+    "deleteError": "Errore durante l'eliminazione del cliente"
   },
   "repairs": {
     "title": "Riparazioni",
@@ -231,6 +241,18 @@
     "notFoundDesc": "La riparazione richiesta non è stata trovata o non esiste.",
     "backToRepairs": "Torna alle Riparazioni",
     "loading": "Caricamento...",
+    "addParts": "Aggiungi Ricambi",
+    "manageParts": "Gestisci Ricambi",
+    "selectPart": "Seleziona Ricambio",
+    "quantityUsed": "Quantità Utilizzata",
+    "addSelectedPart": "Aggiungi Ricambio Selezionato",
+    "removePart": "Rimuovi Ricambio",
+    "partAdded": "Ricambio aggiunto",
+    "partAddedSuccess": "Il ricambio è stato aggiunto con successo.",
+    "partRemoved": "Ricambio rimosso",
+    "partRemovedSuccess": "Il ricambio è stato rimosso con successo.",
+    "partError": "Errore durante la gestione del ricambio",
+    "insufficientStock": "Scorte insufficienti per questo ricambio",
     "status": {
       "pending": "In Attesa",
       "inProgress": "In Lavorazione", 
@@ -280,7 +302,10 @@
     "loading": "Caricamento...",
     "no_data": "Nessun dato disponibile",
     "error": "Errore",
-    "success": "Successo"
+    "success": "Successo",
+    "actions": "Azioni",
+    "confirm": "Conferma",
+    "close": "Chiudi"
   },
   "error": {
     "accessDenied": "Accesso Negato",

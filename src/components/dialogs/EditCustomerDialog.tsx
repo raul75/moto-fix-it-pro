@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogContent,
@@ -24,11 +25,13 @@ const EditCustomerDialog = ({
   onSubmit,
   isLoading = false
 }: EditCustomerDialogProps) => {
+  const { t } = useTranslation();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Modifica Cliente</DialogTitle>
+          <DialogTitle>{t('customers.editCustomer')}</DialogTitle>
         </DialogHeader>
         
         {customer && (
