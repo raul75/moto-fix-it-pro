@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -27,7 +28,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const { user, logout, isAuthenticated } = useAuth();
   const { t } = useTranslation();
-  const { theme, setTheme, mounted } = usePersistedTheme();
+  const { theme, mounted, toggleTheme } = usePersistedTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigationItems = [
@@ -71,7 +72,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   const getCurrentPageTitle = () => {
     const item = navigationItems.find(item => item.path === location.pathname);
-    return item ? item.label : 'Officina';
+    return item ? item.label : 'MotoFix';
   };
 
   return (
@@ -89,8 +90,12 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <SheetContent side="left" className="w-64 p-0">
               <div className="flex h-full flex-col">
                 <div className="flex h-14 items-center border-b px-6">
-                  <Wrench className="mr-2 h-6 w-6" />
-                  <span className="font-semibold">Officina</span>
+                  <img 
+                    src="/lovable-uploads/5b289d77-4537-4aa6-b011-df0e4cd7b186.png" 
+                    alt="MotoFix Logo" 
+                    className="mr-2 h-8 w-8 object-contain"
+                  />
+                  <span className="font-semibold">MotoFix</span>
                 </div>
                 <nav className="flex-1 space-y-1 p-4">
                   {navigationItems.map((item) => (
@@ -115,7 +120,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                        onClick={toggleTheme}
                       >
                         {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                       </Button>
@@ -171,8 +176,12 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         {/* Desktop Sidebar */}
         <div className="hidden lg:flex w-64 flex-col fixed inset-y-0 z-50 border-r bg-background">
           <div className="flex h-14 items-center border-b px-6">
-            <Wrench className="mr-2 h-6 w-6" />
-            <span className="font-semibold">Officina</span>
+            <img 
+              src="/lovable-uploads/5b289d77-4537-4aa6-b011-df0e4cd7b186.png" 
+              alt="MotoFix Logo" 
+              className="mr-2 h-8 w-8 object-contain"
+            />
+            <span className="font-semibold">MotoFix</span>
           </div>
           <nav className="flex-1 space-y-1 p-4">
             {navigationItems.map((item) => (
@@ -194,7 +203,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                  onClick={toggleTheme}
                 >
                   {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                 </Button>

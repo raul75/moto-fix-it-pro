@@ -29,7 +29,7 @@ i18n
   // init i18next
   .init({
     resources,
-    fallbackLng: 'es', // Spanish as default language
+    fallbackLng: 'it', // Italian as default language
     debug: false,
     interpolation: {
       escapeValue: false // not needed for react as it escapes by default

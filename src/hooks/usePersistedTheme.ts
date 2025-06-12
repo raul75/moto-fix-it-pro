@@ -11,21 +11,23 @@ export const usePersistedTheme = () => {
   }, []);
 
   useEffect(() => {
-    if (mounted && theme) {
-      // Persist theme to localStorage
-      localStorage.setItem('app-theme', theme);
-    }
-  }, [theme, mounted]);
-
-  useEffect(() => {
     if (mounted) {
-      // Load persisted theme on mount
+      // Check if there's a persisted theme, otherwise set dark as default
       const persistedTheme = localStorage.getItem('app-theme');
-      if (persistedTheme && persistedTheme !== theme) {
+      if (!persistedTheme) {
+        setTheme('dark');
+        localStorage.setItem('app-theme', 'dark');
+      } else if (persistedTheme !== theme) {
         setTheme(persistedTheme);
       }
     }
   }, [mounted, setTheme, theme]);
 
-  return { theme, setTheme, mounted };
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    localStorage.setItem('app-theme', newTheme);
+  };
+
+  return { theme, setTheme, mounted, toggleTheme };
 };
