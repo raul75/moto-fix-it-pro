@@ -12,20 +12,16 @@ export const usePersistedTheme = () => {
 
   useEffect(() => {
     if (mounted) {
-      // Forza sempre il tema scuro come default se non c'è una preferenza salvata
-      const persistedTheme = localStorage.getItem('theme');
-      if (!persistedTheme) {
-        setTheme('dark');
-        localStorage.setItem('theme', 'dark');
-      }
+      // Forza sempre il tema scuro
+      setTheme('dark');
+      localStorage.setItem('theme', 'dark');
     }
   }, [mounted, setTheme]);
 
+  // Non permettere il cambio di tema - sempre scuro
   const toggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
-    localStorage.setItem('theme', newTheme);
+    // Non fa nulla - mantiene sempre il tema scuro
   };
 
-  return { theme, setTheme, mounted, toggleTheme };
+  return { theme: 'dark', setTheme, mounted, toggleTheme };
 };

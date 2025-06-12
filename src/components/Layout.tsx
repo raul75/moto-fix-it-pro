@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -18,8 +17,6 @@ import {
   Settings, 
   LogOut, 
   Menu,
-  Moon,
-  Sun,
   User
 } from 'lucide-react';
 
@@ -28,7 +25,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const { user, logout, isAuthenticated } = useAuth();
   const { t } = useTranslation();
-  const { theme, mounted, toggleTheme } = usePersistedTheme();
+  const { mounted } = usePersistedTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navigationItems = [
@@ -116,15 +113,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 <div className="border-t p-4">
                   <div className="flex items-center gap-2 mb-4">
                     <LanguageSelector />
-                    {mounted && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={toggleTheme}
-                      >
-                        {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                      </Button>
-                    )}
                   </div>
                   <Button 
                     variant="ghost" 
@@ -199,15 +187,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           <div className="border-t p-4">
             <div className="flex items-center justify-between mb-4">
               <LanguageSelector />
-              {mounted && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={toggleTheme}
-                >
-                  {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                </Button>
-              )}
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
