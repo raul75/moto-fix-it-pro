@@ -192,34 +192,32 @@ const RepairDetailsPage = () => {
         <h1 className="text-2xl font-bold">
           {isEditing ? 'Modifica Riparazione' : 'Dettagli Riparazione'}
         </h1>
-        {repair.status !== 'completed' && (
-          <Button 
-            size="sm" 
-            onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-            disabled={updateRepairMutation.isPending}
-          >
-            {isEditing ? (
-              <>
-                {updateRepairMutation.isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Salvataggio...
-                  </>
-                ) : (
-                  <>
-                    <Save className="mr-2 h-4 w-4" />
-                    Salva
-                  </>
-                )}
-              </>
-            ) : (
-              <>
-                <Edit className="mr-2 h-4 w-4" />
-                Modifica
-              </>
-            )}
-          </Button>
-        )}
+        <Button 
+          size="sm" 
+          onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+          disabled={updateRepairMutation.isPending}
+        >
+          {isEditing ? (
+            <>
+              {updateRepairMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Salvataggio...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Salva
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              <Edit className="mr-2 h-4 w-4" />
+              Modifica
+            </>
+          )}
+        </Button>
         {isEditing && (
           <Button 
             variant="outline" 
