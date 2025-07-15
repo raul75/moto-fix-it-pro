@@ -67,10 +67,14 @@ export async function getRepairsByCustomerId(customerId: string): Promise<Repair
 
 // Get a repair by ID with photos and parts
 export async function getRepairById(id: string): Promise<Repair> {
-  // Get the repair
+  // Get the repair with customer and motorcycle data
   const { data: repairData, error: repairError } = await supabase
     .from('repairs')
-    .select('*')
+    .select(`
+      *,
+      customers!inner(name),
+      motorcycles!inner(make, model, year, license_plate)
+    `)
     .eq('id', id)
     .single();
   
@@ -79,6 +83,10 @@ export async function getRepairById(id: string): Promise<Repair> {
   }
   
   const repair = mapRepair(repairData);
+  
+  // Add customer name and motorcycle info
+  repair.customerName = repairData.customers?.name;
+  repair.motorcycleInfo = `${repairData.motorcycles?.make} ${repairData.motorcycles?.model} (${repairData.motorcycles?.year}) - ${repairData.motorcycles?.license_plate}`;
   
   // Get repair photos
   const { data: photosData, error: photosError } = await supabase

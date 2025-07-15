@@ -496,11 +496,11 @@ const RepairDetailsPage = () => {
             <CardContent className="space-y-4">
               <div>
                 <Label>Cliente</Label>
-                <p className="font-semibold">{repair.customerId}</p>
+                <p className="font-semibold">{repair.customerName || repair.customerId}</p>
               </div>
               <div>
                 <Label>Moto</Label>
-                <p className="font-semibold">{repair.motorcycleId}</p>
+                <p className="font-semibold">{repair.motorcycleInfo || repair.motorcycleId}</p>
               </div>
               <div>
                 <Label>Creato il</Label>

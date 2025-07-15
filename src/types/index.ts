@@ -34,6 +34,9 @@ export type Repair = {
   notes?: string;
   photos: Photo[];
   parts: UsedPart[];
+  // Added for display purposes
+  customerName?: string;
+  motorcycleInfo?: string;
 };
 
 export type Photo = {
