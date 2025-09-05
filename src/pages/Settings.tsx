@@ -18,7 +18,6 @@ import { Edit, Trash2, Plus } from 'lucide-react';
 const SettingsPage = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [isEditUserOpen, setIsEditUserOpen] = useState(false);
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
@@ -35,20 +34,6 @@ const SettingsPage = () => {
     { id: 3, name: 'Cliente Test', email: 'cliente@example.com', role: 'customer' }
   ]);
 
-  const handleDarkModeToggle = (checked: boolean) => {
-    setIsDarkMode(checked);
-    // Toggle dark mode class on document root
-    if (checked) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    
-    toast({
-      title: t('common.success'),
-      description: checked ? 'Modalità scura attivata' : 'Modalità chiara attivata',
-    });
-  };
 
   const handleEditUser = (user: any) => {
     setSelectedUser(user);
@@ -151,20 +136,6 @@ const SettingsPage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="dark-mode">{t('settings.general.darkMode')}</Label>
-                  <Switch 
-                    id="dark-mode" 
-                    checked={isDarkMode}
-                    onCheckedChange={handleDarkModeToggle}
-                  />
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  {t('settings.general.darkModeDesc')}
-                </p>
-              </div>
-              
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="notifications">{t('settings.general.notifications')}</Label>
