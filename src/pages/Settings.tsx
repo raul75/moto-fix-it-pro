@@ -23,6 +23,10 @@ const SettingsPage = () => {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [newUser, setNewUser] = useState({ name: '', email: '', role: '' });
+  const [companyHeader, setCompanyHeader] = useState(
+    localStorage.getItem('company-header') || 'MotoFix Officina\nVia dell\'Officina 123\n20100 Milano (MI)\nP.IVA: IT12345678901\nTel: 02 1234567\nEmail: info@motofix.it'
+  );
+  const [companyLogo, setCompanyLogo] = useState<File | null>(null);
 
   // Mock users data - in real app this would come from API
   const [users, setUsers] = useState([
@@ -87,6 +91,41 @@ const SettingsPage = () => {
         description: t('settings.users.userAdded'),
       });
     }
+  };
+
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) { // 2MB limit
+        toast({
+          title: "Errore",
+          description: "Il file è troppo grande. Massimo 2MB.",
+          variant: "destructive"
+        });
+        return;
+      }
+      setCompanyLogo(file);
+      
+      // Create preview URL and save to localStorage
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        localStorage.setItem('company-logo-url', result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSaveInvoiceSettings = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Save company header
+    localStorage.setItem('company-header', companyHeader);
+    
+    toast({
+      title: "Successo",
+      description: "Impostazioni fatturazione salvate con successo",
+    });
   };
   
   return (
@@ -236,45 +275,80 @@ const SettingsPage = () => {
         <TabsContent value="invoices" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>{t('settings.invoices.title')}</CardTitle>
+              <CardTitle>Impostazioni Fatturazione</CardTitle>
               <CardDescription>
-                {t('settings.invoices.description')}
+                Configura logo, intestazione e parametri di fatturazione
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <form className="space-y-6" onSubmit={handleSaveInvoiceSettings}>
+                {/* Logo e Intestazione */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Logo e Intestazione</h3>
+                  
                   <div className="space-y-2">
-                    <Label htmlFor="invoice-prefix">{t('settings.invoices.invoicePrefix')}</Label>
-                    <Input id="invoice-prefix" placeholder="INV-" />
+                    <Label htmlFor="company-logo">Logo Azienda</Label>
+                    <Input 
+                      id="company-logo" 
+                      type="file" 
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/80"
+                    />
+                    <p className="text-sm text-muted-foreground">Carica il logo della tua azienda (JPG, PNG, max 2MB)</p>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="next-number">{t('settings.invoices.nextNumber')}</Label>
-                    <Input id="next-number" placeholder="2023-003" />
+                    <Label htmlFor="company-header">Intestazione Azienda</Label>
+                    <Textarea 
+                      id="company-header" 
+                      value={companyHeader}
+                      onChange={(e) => setCompanyHeader(e.target.value)}
+                      placeholder="MotoFix Officina&#10;Via dell'Officina 123&#10;20100 Milano (MI)&#10;P.IVA: IT12345678901&#10;Tel: 02 1234567&#10;Email: info@motofix.it"
+                      rows={6}
+                    />
+                    <p className="text-sm text-muted-foreground">Inserisci l'intestazione completa della tua azienda</p>
+                  </div>
+                </div>
+
+                <div className="border-t pt-6">
+                  <h3 className="text-lg font-medium mb-4">Parametri Fatturazione</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="invoice-prefix">Prefisso Fattura</Label>
+                      <Input id="invoice-prefix" placeholder="INV-" />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="next-number">Prossimo Numero</Label>
+                      <Input id="next-number" placeholder="2023-003" />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="payment-terms">Termini di Pagamento (giorni)</Label>
+                      <Input id="payment-terms" placeholder="30" type="number" />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="tax-rate">Aliquota IVA (%)</Label>
+                      <Input id="tax-rate" placeholder="22" type="number" />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2 mt-4">
+                    <Label htmlFor="invoice-notes">Note Standard Fattura</Label>
+                    <Textarea 
+                      id="invoice-notes" 
+                      placeholder="Pagamento da effettuare entro 30 giorni dalla data della fattura."
+                      rows={3}
+                    />
                   </div>
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="payment-terms">{t('settings.invoices.paymentTerms')}</Label>
-                  <Input id="payment-terms" placeholder="30" type="number" />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="tax-rate">{t('settings.invoices.taxRate')}</Label>
-                  <Input id="tax-rate" placeholder="22" type="number" />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="invoice-notes">{t('settings.invoices.invoiceNotes')}</Label>
-                  <Textarea 
-                    id="invoice-notes" 
-                    placeholder="Pagamento da effettuare entro 30 giorni dalla data della fattura."
-                    rows={4}
-                  />
-                </div>
-                
-                <Button type="submit">{t('settings.invoices.save')}</Button>
+                <Button type="submit" className="w-full">Salva Impostazioni Fatturazione</Button>
               </form>
             </CardContent>
           </Card>

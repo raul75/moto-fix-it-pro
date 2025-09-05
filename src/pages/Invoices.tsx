@@ -106,6 +106,11 @@ ${invoice.notes ? 'Note: ' + invoice.notes : ''}
 
   const handlePrintInvoice = (invoice: Invoice) => {
     const customerName = getCustomerName(invoice.customerId);
+    
+    // Get company settings from localStorage (in a real app, this would come from API)
+    const companyHeader = localStorage.getItem('company-header') || 'MotoFix Officina\nVia dell\'Officina 123\n20100 Milano (MI)\nP.IVA: IT12345678901';
+    const companyLogo = localStorage.getItem('company-logo-url') || '';
+    
     const printWindow = window.open('', '_blank');
     if (printWindow) {
       printWindow.document.write(`
@@ -113,28 +118,108 @@ ${invoice.notes ? 'Note: ' + invoice.notes : ''}
           <head>
             <title>Fattura ${invoice.number}</title>
             <style>
-              body { font-family: Arial, sans-serif; margin: 20px; }
-              .header { text-align: center; margin-bottom: 30px; }
-              .invoice-details { margin-bottom: 20px; }
-              .totals { text-align: right; margin-top: 20px; }
+              body { 
+                font-family: Arial, sans-serif; 
+                margin: 0; 
+                padding: 20px;
+                color: #333;
+              }
+              .company-header { 
+                border-bottom: 2px solid #333;
+                padding-bottom: 20px;
+                margin-bottom: 30px;
+                display: flex;
+                align-items: flex-start;
+                gap: 20px;
+              }
+              .company-logo {
+                max-width: 120px;
+                max-height: 80px;
+              }
+              .company-info {
+                flex: 1;
+                white-space: pre-line;
+                font-size: 14px;
+                line-height: 1.4;
+              }
+              .invoice-title { 
+                text-align: center; 
+                margin-bottom: 30px;
+                font-size: 24px;
+                font-weight: bold;
+                color: #333;
+              }
+              .invoice-number {
+                font-size: 18px;
+                color: #666;
+                margin-top: 5px;
+              }
+              .invoice-details { 
+                margin-bottom: 30px;
+                background: #f8f9fa;
+                padding: 15px;
+                border-radius: 5px;
+              }
+              .invoice-details p {
+                margin: 5px 0;
+                font-size: 14px;
+              }
+              .totals { 
+                text-align: right; 
+                margin-top: 30px;
+                border-top: 1px solid #ddd;
+                padding-top: 15px;
+              }
+              .totals p {
+                margin: 5px 0;
+                font-size: 14px;
+              }
+              .total-final {
+                font-size: 18px !important;
+                font-weight: bold !important;
+                color: #333 !important;
+                border-top: 2px solid #333;
+                padding-top: 10px;
+                margin-top: 10px;
+              }
+              .notes {
+                margin-top: 30px;
+                padding: 15px;
+                background: #f8f9fa;
+                border-left: 4px solid #333;
+                font-size: 12px;
+                color: #666;
+              }
+              @media print {
+                body { margin: 0; }
+                .company-header { page-break-inside: avoid; }
+              }
             </style>
           </head>
           <body>
-            <div class="header">
-              <h1>FATTURA</h1>
-              <h2>${invoice.number}</h2>
+            <div class="company-header">
+              ${companyLogo ? `<img src="${companyLogo}" alt="Logo Azienda" class="company-logo">` : ''}
+              <div class="company-info">${companyHeader}</div>
             </div>
+            
+            <div class="invoice-title">
+              FATTURA
+              <div class="invoice-number">${invoice.number}</div>
+            </div>
+            
             <div class="invoice-details">
               <p><strong>Cliente:</strong> ${customerName}</p>
-              <p><strong>Data:</strong> ${invoice.date}</p>
-              <p><strong>Scadenza:</strong> ${invoice.dueDate}</p>
+              <p><strong>Data Fattura:</strong> ${new Date(invoice.date).toLocaleDateString('it-IT')}</p>
+              <p><strong>Data Scadenza:</strong> ${new Date(invoice.dueDate).toLocaleDateString('it-IT')}</p>
             </div>
+            
             <div class="totals">
-              <p>Subtotale: €${invoice.subtotal.toFixed(2)}</p>
-              <p>IVA: €${invoice.tax.toFixed(2)}</p>
-              <p><strong>TOTALE: €${invoice.total.toFixed(2)}</strong></p>
+              <p>Imponibile: €${invoice.subtotal.toFixed(2)}</p>
+              <p>IVA (22%): €${invoice.tax.toFixed(2)}</p>
+              <p class="total-final">TOTALE: €${invoice.total.toFixed(2)}</p>
             </div>
-            ${invoice.notes ? `<div><p><strong>Note:</strong> ${invoice.notes}</p></div>` : ''}
+            
+            ${invoice.notes ? `<div class="notes"><strong>Note:</strong><br>${invoice.notes}</div>` : ''}
           </body>
         </html>
       `);
