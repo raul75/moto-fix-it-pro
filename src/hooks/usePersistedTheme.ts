@@ -1,9 +1,8 @@
 
 import { useState, useEffect } from 'react';
-import { useTheme } from 'next-themes';
+
 
 export const usePersistedTheme = () => {
-  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -13,15 +12,15 @@ export const usePersistedTheme = () => {
   useEffect(() => {
     if (mounted) {
       // Forza sempre il tema scuro
-      setTheme('dark');
+      document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
     }
-  }, [mounted, setTheme]);
+  }, [mounted]);
 
   // Non permettere il cambio di tema - sempre scuro
   const toggleTheme = () => {
     // Non fa nulla - mantiene sempre il tema scuro
   };
 
-  return { theme: 'dark', setTheme, mounted, toggleTheme };
+  return { theme: 'dark', setTheme: () => {}, mounted, toggleTheme };
 };
